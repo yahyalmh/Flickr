@@ -13,4 +13,4 @@ dependencyResolutionManagement {
     }
 }
 rootProject.name = "Flickr"
-include ':app'
+include( ":app")
