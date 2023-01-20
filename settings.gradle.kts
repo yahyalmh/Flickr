@@ -14,3 +14,5 @@ dependencyResolutionManagement {
 }
 rootProject.name = "Flickr"
 include( ":app")
+include( ":ui:main")
+include( ":ui:common")

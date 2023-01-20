@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="home">Home</string>
+    <string name="txt_retry">Retry</string>
+    <string name="search">Search</string>
+    <string name="emptyIcon">Empty Icon</string>
+    <string name="autoRetryIcon">Auto Retry Icon</string>
+    <string name="favorite">Favorite</string>
+    <string name="setting">Setting</string>
+    <string name="homeTabContentDescription">home Tab</string>
+    <string name="favoriteTabContentDescription">favorite tab</string>
+    <string name="settingTabContentDescription">setting tab</string>
+</resources>

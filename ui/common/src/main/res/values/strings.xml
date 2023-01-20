@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="retry">Retry</string>
+    <string name="defaultErrorHint">We\'r sorry \n Something went wrong \n\n Pleas try again</string>
+    <string name="emptyIcon">Empty Icon</string>
+    <string name="search">Search</string>
+    <string name="autoRetryHint">Go online to try again</string>
+    <string name="autoRetryIconDescription">Auto retry icon</string>
+    <string name="warningIconDescription">warning icon</string>
+    <string name="favoriteIconDescription">Favorite Icon</string>
+    <string name="backIconContentDescription">Back Icon</string>
+    <string name="cancel">Cancel</string>
+    <string name="offline">Offline</string>
+    <string name="waitForNetwork">Waiting for network…</string>
+    <string name="online">Online</string>
+</resources>
