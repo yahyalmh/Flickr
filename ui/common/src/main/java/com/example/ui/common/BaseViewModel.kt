@@ -5,11 +5,6 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 
-/**
- * @author yaya (@yahyalmh)
- * @since 29th September 2022
- */
-
 abstract class BaseViewModel<T : UIState, E : UIEvent>(initialState: T) : ViewModel() {
     private var internalSate: MutableState<T> = mutableStateOf(initialState)
     val state: State<T> = internalSate

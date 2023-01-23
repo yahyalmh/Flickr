@@ -1,7 +1,3 @@
-/**
- * @author yaya (@yahyalmh)
- * @since 28th October 2022
- */
 
 object AppConfig {
 

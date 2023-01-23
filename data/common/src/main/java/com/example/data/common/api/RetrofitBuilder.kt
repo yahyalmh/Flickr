@@ -2,11 +2,6 @@ package com.example.data.common.api
 
 import retrofit2.Retrofit
 
-/**
- * @author yaya (@yahyalmh)
- * @since 25th November 2022
- */
-
 interface RetrofitBuilder {
 
     val retrofit: Retrofit

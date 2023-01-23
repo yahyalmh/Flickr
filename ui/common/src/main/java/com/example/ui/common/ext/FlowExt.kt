@@ -7,11 +7,6 @@ import kotlinx.coroutines.flow.*
 import java.io.IOException
 import kotlin.coroutines.CoroutineContext
 
-/**
- * @author yaya (@yahyalmh)
- * @since 09th November 2022
- */
-
 fun <T> Flow<T>.retryWithPolicy(
     retryPolicy: RetryPolicy = RetryPolicy.DefaultRetryPolicy,
     retryHandler: (e: Throwable) -> Unit

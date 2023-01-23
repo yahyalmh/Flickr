@@ -5,11 +5,6 @@ import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import javax.inject.Inject
 
-/**
- * @author yaya (@yahyalmh)
- * @since 25th November 2022
- */
-
 class FlickrRetrofit @Inject constructor(
     private val retrofitBuilder: Retrofit.Builder,
     private val okHttpClientBuilder: OkHttpClient.Builder

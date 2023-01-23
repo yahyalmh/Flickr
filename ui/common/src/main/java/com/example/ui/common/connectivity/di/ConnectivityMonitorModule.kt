@@ -8,11 +8,6 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
-/**
- * @author yaya (@yahyalmh)
- * @since 04th November 2022
- */
-
 @Module
 @InstallIn(SingletonComponent::class)
 interface ConnectivityMonitorModule {

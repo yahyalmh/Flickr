@@ -15,10 +15,6 @@ import com.example.main.nav.AppNavHost
 import com.example.main.theme.AppTheme
 import com.example.ui.common.component.bar.ConnectivityStatusView
 
-/**
- * @author yaya (@yahyalmh)
- * @since 29th October 2022
- */
 @Composable
 fun MainScreen(
     modifier: Modifier = Modifier,

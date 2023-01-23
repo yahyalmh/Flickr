@@ -9,10 +9,6 @@ import com.example.home.nav.HomeRoute.Companion.HOME_ROUTE
 import com.example.home.nav.HomeRoute.Companion.homeGraph
 import com.example.search.nav.SearchRoute.Companion.searchGraph
 
-/**
- * @author yaya (@yahyalmh)
- * @since 29th October 2022
- */
 @Composable
 fun AppNavHost(
     navController: NavHostController,

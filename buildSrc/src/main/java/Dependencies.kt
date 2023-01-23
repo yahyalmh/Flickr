@@ -8,11 +8,6 @@ import org.gradle.api.artifacts.Dependency
 import org.gradle.api.artifacts.dsl.DependencyHandler
 import org.gradle.kotlin.dsl.project
 
-/**
- * @author yaya (@yahyalmh)
- * @since 28th October 2022
- */
-
 object Dependencies {
     const val ANDROIDX_CORE_KTX = "androidx.core:core-ktx:${Version.Androidx.CORE_KTX}"
     const val ANDROID_LIFECYCLE_RUNTIME =

@@ -31,10 +31,6 @@ import androidx.compose.ui.zIndex
 import com.example.ui.common.test.TestTag
 import kotlinx.coroutines.delay
 
-/**
- * @author yaya (@yahyalmh)
- * @since 10th November 2022
- */
 
 @Composable
 fun LoadingView(

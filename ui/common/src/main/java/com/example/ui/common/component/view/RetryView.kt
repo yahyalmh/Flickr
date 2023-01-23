@@ -23,11 +23,6 @@ import com.example.ui.common.test.TestTag
 import  com.example.flickr.ui.common.R
 
 
-/**
- * @author yaya (@yahyalmh)
- * @since 10th November 2022
- */
-
 @Composable
 fun RetryView(
     modifier: Modifier = Modifier,

@@ -19,10 +19,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.example.ui.common.test.TestTag
 import com.example.flickr.ui.common.R
 
-/**
- * @author yaya (@yahyalmh)
- * @since 02th November 2022
- */
 
 @Composable
 fun ConnectivityStatusView(
