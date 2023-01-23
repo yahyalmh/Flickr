@@ -42,14 +42,16 @@ android {
 }
 
 dependencies {
-
     androidxCore()
     compose()
     composeNavigation()
     composeViewModel()
     composeMaterial()
-
     coroutines()
+    hilt()
+    coilCompose()
+    placeholder()
+    gson()
 
     junit5()
     junit4()
@@ -57,13 +59,7 @@ dependencies {
     espresso()
     mockito()
     composeTest()
-
-    composeConstraintLayout()
-    hilt()
     hiltTest()
-    coilCompose()
-    placeholder()
-    gson()
 
     moduleDependency(":ui:common")
     moduleDependency(":ui:search")
