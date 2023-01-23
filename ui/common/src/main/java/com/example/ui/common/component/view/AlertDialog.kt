@@ -120,10 +120,10 @@ fun TwoOptionAlertDialog(
 fun TwoOptionDialogPreview() {
     TwoOptionAlertDialog(
         isVisible = true,
-        title = "Discard Receipt?",
-        message = "If you go back, you lose scanned receipt",
+        title = "Title",
+        message = "Message for user to know what to do!",
         confirmColor = Color.Red,
-        confirmText = "Discard",
+        confirmText = "Remove",
         dismissText = "Cancel",
         onConfirmListener = { }) { }
 }

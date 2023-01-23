@@ -9,6 +9,7 @@
     <string name="warningIconDescription">warning icon</string>
     <string name="favoriteIconDescription">Favorite Icon</string>
     <string name="backIconContentDescription">Back Icon</string>
+    <string name="imageContentDescription">Image</string>
     <string name="cancel">Cancel</string>
     <string name="offline">Offline</string>
     <string name="waitForNetwork">Waiting for network…</string>

@@ -11,10 +11,12 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
+import com.example.flickr.ui.common.R
 import com.example.ui.common.component.icon.AppIcons
 import com.example.ui.common.ext.RandomString
 import com.google.accompanist.placeholder.PlaceholderHighlight
@@ -55,7 +57,7 @@ fun PhotoCell(
                         )
                         .clip(RoundedCornerShape(8.dp)),
                     model = address,
-                    contentDescription = "Image",
+                    contentDescription = stringResource(id = R.string.imageContentDescription),
                     contentScale = ContentScale.FillBounds,
                     onSuccess = { isImageLoading = false }
                 )
