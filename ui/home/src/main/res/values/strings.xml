@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="bookmark">Bookmark</string>
+    <string name="searchIconContentDescription">Search Icon</string>
+    <string name="noBookmarkMessage">Search your favorite images, bookmark them to see here</string>
+    <string name="menu">Menu</string>
+</resources>
