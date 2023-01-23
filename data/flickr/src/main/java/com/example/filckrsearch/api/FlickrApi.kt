@@ -11,15 +11,15 @@ interface FlickrApi {
 
     @GET("rest/?method=flickr.photos.search&safe_search=1&nojsoncallback=1&format=json")
     suspend fun search(
-        @Query("api_key") apiKey: String = API_KEY,
         @Query("text") query: String,
         @Query("page") page: Int,
-        @Query("per_page") perPage: Int
+        @Query("per_page") perPage: Int,
+        @Query("api_key") apiKey: String = API_KEY
     ): SearchResponse
 
     @GET("rest/?method=flickr.photos.getInfo&nojsoncallback=1&format=json")
     suspend fun getPhotoDetail(
-        @Query("api_key") apiKey: String = API_KEY,
         @Query("photo_id") photoId: String,
+        @Query("api_key") apiKey: String = API_KEY,
     ): DetailResponse
 }
