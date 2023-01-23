@@ -112,7 +112,6 @@ fun DependencyHandler.placeholder() = implementation(Dependencies.ACCOMPANIST_PL
 
 fun DependencyHandler.room() {
     implementation(ROOM_RUNTIME)
-    implementation(ROOM_COROUTINE)
     annotationProcessor(ROOM_COMPILER)
     kapt(ROOM_COMPILER)
     testImplementation(ROOM_TEST)

@@ -52,6 +52,7 @@ android {
 
 
 dependencies {
+
     androidxCore()
     compose()
     composeMaterial()
@@ -60,5 +61,5 @@ dependencies {
     coroutines()
     hilt()
     junit4()
-
+    moduleDependency(":ui:main")
 }

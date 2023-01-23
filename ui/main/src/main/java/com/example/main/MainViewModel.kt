@@ -2,7 +2,6 @@ package com.example.main
 
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
-import com.example.main.nav.MainRout
 import com.example.ui.common.BaseViewModel
 import com.example.ui.common.UIEvent
 import com.example.ui.common.UIState
