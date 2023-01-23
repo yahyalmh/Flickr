@@ -82,7 +82,7 @@ fun PhotoCell(
                     Icon(
                         modifier = Modifier.padding(4.dp),
                         imageVector = leadingIcon,
-                        contentDescription = "",
+                        contentDescription = stringResource(id = R.string.favoriteIconDescription),
                         tint = Color.Red
                     )
                 }

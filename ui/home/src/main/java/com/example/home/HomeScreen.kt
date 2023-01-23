@@ -6,6 +6,7 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -20,7 +21,8 @@ import com.example.ui.common.component.screen.TopBarScaffold
 import com.example.ui.common.component.view.EmptyView
 import com.example.ui.common.component.view.RetryView
 import com.example.ui.common.ext.RandomString
-import com.example.ui.common.ext.create
+import com.example.ui.common.ext.createComposable
+import com.example.ui.common.test.TestTag.SHIMMER_VIEW
 
 @Composable
 fun HomeScreen(
@@ -42,7 +44,7 @@ fun HomeScreenContent(
     modifier: Modifier = Modifier,
     uiState: HomeUiState,
     onRetry: () -> Unit = {},
-    onSearchClicked: () -> Unit,
+    onSearchClicked: () -> Unit = {},
     onPhotoClick: (photoId: String) -> Unit = {},
     onBookmarkClick: (photoId: String) -> Unit = {},
 ) {
@@ -90,7 +92,7 @@ private fun HomeShimmerView(
 ) {
     if (isVisible) {
         LazyVerticalGrid(
-            modifier = modifier,
+            modifier = modifier.testTag(SHIMMER_VIEW),
             columns = GridCells.Adaptive(minSize = 150.dp)
         ) {
             items(10) { PhotoShimmerCell() }
@@ -137,7 +139,7 @@ fun HomeShimmerPreview() {
 @ReferenceDevices
 fun DataPreview() = DataView(
     modifier = Modifier,
-    bookmarkedPhotos = create(10) { photoEntityStub() },
+    bookmarkedPhotos = createComposable(10) { photoEntityStub() },
     isVisible = true,
     onPhotoClick = {},
     onBookmarkClick = {}
