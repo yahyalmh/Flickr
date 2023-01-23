@@ -2,11 +2,10 @@ plugins {
     id("com.android.library")
     id("org.jetbrains.kotlin.android")
     kotlin("kapt")
-    id("de.mannodermaus.android-junit5")
     id("com.google.dagger.hilt.android")
 }
 android {
-    namespace = "com.example.flickr.ui.common"
+    namespace = "com.example.flickr.ui.search"
     compileSdk = AppConfig.compileSdk
 
     defaultConfig {
@@ -32,6 +31,7 @@ android {
     kotlinOptions {
         jvmTarget = "1.8"
     }
+
     buildFeatures {
         compose = true
     }
@@ -41,17 +41,19 @@ android {
 }
 
 dependencies {
-    androidxCore()
-    junit4()
-    junit5()
-    mockito()
     compose()
-    hiltTest()
-    hilt()
-    coilCompose()
-    placeholder()
-    coroutines()
-    composeTest()
-    androidXTest()
+    composeNavigation()
+    composeViewModel()
     composeMaterial()
+    hilt()
+    junit4()
+    placeholder()
+    coilCompose()
+
+    moduleDependency(":data:common")
+    moduleDependency(":data:flickr")
+    moduleDependency(":data:bookmark")
+    moduleDependency(":data:searchhistory")
+    moduleDependency(":ui:common")
+    moduleDependency(":ui:detail")
 }

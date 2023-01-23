@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="noItemFound">No item found for </string>
+    <string name="startSearchHint">Search and bookmark photos you like</string>
+    <string name="searchAutoRetryHint">Go online to search again</string>
+    <string name="searchBarHint">Search Photos</string>
+</resources>

@@ -46,14 +46,15 @@ dependencies {
     composeNavigation()
     composeViewModel()
     composeMaterial()
+    coilCompose()
 
     junit4()
     composeTest()
-
-    composeConstraintLayout()
     hilt()
     hiltTest()
 
     moduleDependency(":ui:common")
-//    moduleDependency(":ui:home")
+    moduleDependency(":ui:home")
+    moduleDependency(":ui:search")
+    moduleDependency(":ui:detail")
 }
