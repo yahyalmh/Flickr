@@ -1,5 +1,6 @@
 package com.example.search
 
+import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.viewModelScope
 import com.example.bookmark.BookmarksInteractor
 import com.example.data.common.database.bookmark.PhotoEntity
@@ -32,7 +33,9 @@ class SearchViewModel @Inject constructor(
     private val imageDownloader: ImageDownloader,
     private val searchHistoryInteractor: SearchHistoryInteractor,
 ) : BaseViewModel<SearchUiState, SearchUiEvent>(Start) {
-    private val searchFlow = MutableSharedFlow<String>(extraBufferCapacity = 1)
+    @VisibleForTesting
+    val searchFlow = MutableSharedFlow<String>(extraBufferCapacity = 1)
+
     private lateinit var fetchDataJob: Job
     private var paginationStartPageNumber: Int = 2
     private var defaultPageSize: Int = 25
@@ -156,7 +159,8 @@ class SearchViewModel @Inject constructor(
                     imageUrl = photo.getImageUrl(),
                     fileName = photo.id
                 )
-                bookmarksInteractor.addBookmark(photo.toEntity(localAddress = imageFileAddress))
+                val photoEntity = photo.toEntity(localAddress = imageFileAddress)
+                bookmarksInteractor.addBookmark(photoEntity)
                 println(imageFileAddress)
             } else {
                 bookmarkedPhotos?.find { it.id == photo.id }

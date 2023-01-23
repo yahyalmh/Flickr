@@ -3,6 +3,7 @@ plugins {
     id("org.jetbrains.kotlin.android")
     kotlin("kapt")
     id("com.google.dagger.hilt.android")
+    id("de.mannodermaus.android-junit5")
 }
 android {
     namespace = "com.example.flickr.ui.search"
@@ -45,10 +46,17 @@ dependencies {
     composeNavigation()
     composeViewModel()
     composeMaterial()
-    hilt()
-    junit4()
     placeholder()
     coilCompose()
+    hilt()
+
+    junit5()
+    junit4()
+    androidXTest()
+    espresso()
+    mockito()
+    composeTest()
+    hiltTest()
 
     moduleDependency(":data:common")
     moduleDependency(":data:flickr")
