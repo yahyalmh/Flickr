@@ -9,30 +9,30 @@ import kotlin.random.Random
 
 fun searchHistoriesEntityStub() = create(count = 10) { searchHistoryEntityStub() }
 fun searchHistoryEntityStub() = SearchHistoryEntity(
-    text = RandomString.next(),
-    timestamp = RandomString.next()
+    text = RandomString(),
+    timestamp = RandomString()
 )
 
 fun photoEntitiesStub() = create(count = 10) { photoEntityStub() }
 
 fun photoEntityStub() = PhotoEntity(
-    id = RandomString.next(),
-    title = RandomString.next(),
-    imageUrl = RandomString.next(),
-    localAddress = RandomString.next(),
-    timestamp = RandomString.next()
+    id = RandomString(),
+    title = RandomString(),
+    imageUrl = RandomString(),
+    localAddress = RandomString(),
+    timestamp = RandomString()
 )
 
 fun photosStub() = create(count = 10) { photoStub() }
 
 fun photoStub() = Photo(
     id = Random.nextInt().toString(),
-    owner = RandomString.next(),
-    secret = RandomString.next(),
-    server = RandomString.next(),
-    farm = RandomString.next(),
-    title = RandomString.next(),
-    isPublic = RandomString.next(),
-    isFamily = RandomString.next(),
-    isFriend = RandomString.next(),
+    owner = RandomString(),
+    secret = RandomString(),
+    server = RandomString(),
+    farm = RandomString(),
+    title = RandomString(),
+    isPublic = RandomString(),
+    isFamily = RandomString(),
+    isFriend = RandomString(),
 )

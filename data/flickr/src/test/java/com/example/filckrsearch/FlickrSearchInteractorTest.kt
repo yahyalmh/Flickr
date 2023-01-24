@@ -35,7 +35,7 @@ internal class FlickrSearchInteractorTest {
         whenever(flickrSearchRepository.search(any(), any(), any())).thenReturn(photosModel)
 
         val actual = flickrSearchInteractor.search(
-            query = RandomString.next(),
+            query = RandomString(),
             page = 1,
             perPage = 25
         ).first()

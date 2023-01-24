@@ -16,9 +16,9 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
+import com.example.data.common.ext.RandomString
 import com.example.flickr.ui.common.R
 import com.example.ui.common.component.icon.AppIcons
-import com.example.ui.common.ext.RandomString
 import com.google.accompanist.placeholder.PlaceholderHighlight
 import com.google.accompanist.placeholder.placeholder
 import com.google.accompanist.placeholder.shimmer
@@ -154,8 +154,8 @@ fun PhotoShimmerCell(
 fun PhotoCellPreview() {
     PhotoCell(
         onClick = {},
-        address = RandomString.next(),
-        title = RandomString.next(),
+        address = RandomString(),
+        title = RandomString(),
         leadingIcon = AppIcons.Favorite
     ) {}
 }

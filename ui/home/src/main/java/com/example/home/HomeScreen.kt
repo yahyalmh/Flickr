@@ -12,6 +12,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.data.common.database.bookmark.PhotoEntity
+import com.example.data.common.ext.RandomString
 import com.example.flickr.ui.home.R
 import com.example.ui.common.ReferenceDevices
 import com.example.ui.common.component.cell.PhotoCell
@@ -20,7 +21,6 @@ import com.example.ui.common.component.icon.AppIcons
 import com.example.ui.common.component.screen.TopBarScaffold
 import com.example.ui.common.component.view.EmptyView
 import com.example.ui.common.component.view.RetryView
-import com.example.ui.common.ext.RandomString
 import com.example.ui.common.ext.createComposable
 import com.example.ui.common.test.TestTag.SHIMMER_VIEW
 
@@ -146,9 +146,9 @@ fun DataPreview() = DataView(
 )
 
 internal fun photoEntityStub(): PhotoEntity = PhotoEntity(
-    id = RandomString.next(),
-    imageUrl = RandomString.next(),
-    localAddress = RandomString.next(),
-    title = RandomString.next(),
-    timestamp = RandomString.next()
+    id = RandomString(),
+    imageUrl = RandomString(),
+    localAddress = RandomString(),
+    title = RandomString(),
+    timestamp = RandomString()
 )

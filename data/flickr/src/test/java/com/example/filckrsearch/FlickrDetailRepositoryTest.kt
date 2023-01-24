@@ -39,7 +39,7 @@ class FlickrSearchRepositoryTest {
 
         // when
         val result =
-            flickrSearchRepository.search(query = RandomString.next(), page = 1, perPage = 25)
+            flickrSearchRepository.search(query = RandomString(), page = 1, perPage = 25)
 
         // then
         Assertions.assertEquals(flickrResponse.photos, result)

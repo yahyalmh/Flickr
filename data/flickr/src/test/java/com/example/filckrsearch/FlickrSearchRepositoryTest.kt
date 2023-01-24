@@ -41,7 +41,7 @@ class FlickrDetailRepositoryTest {
         val result = flickrDetailRepository.getPhotoDetail(photoId)
 
         // then
-        Assertions.assertEquals(photoDetailModel, result)
+        Assertions.assertEquals(photoDetailModel, result.photo)
     }
 }
 

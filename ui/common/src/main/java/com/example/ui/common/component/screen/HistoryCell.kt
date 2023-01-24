@@ -11,7 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.ui.common.ext.RandomString
+import com.example.data.common.ext.RandomString
 import com.example.flickr.ui.common.R
 import com.example.ui.common.component.icon.AppIcons
 
@@ -68,7 +68,7 @@ fun String.toHistoryCell(
 fun HistoryCellPreview() {
     HistoryCell(
         onClick = {},
-        history = RandomString.next(),
+        history = RandomString(),
     ) {}
 }
 

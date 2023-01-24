@@ -223,7 +223,7 @@ internal class SearchViewModelTest {
         whenever(flickrSearchInteractor.search(any(), any(), any())).thenReturn(flowOf(photosStub))
         whenever(bookmarksInteractor.getBookmarks()).thenReturn(flowOf(bookmarkedPhotos))
         whenever(searchHistoryInteractor.getHistories()).thenEmitNothing()
-        val randomFileAddress = RandomString.next()
+        val randomFileAddress = RandomString()
         whenever(imageDownloader.downloadToFiles(any(), any())).thenReturn(randomFileAddress)
 
         searchViewModel = SearchViewModel(

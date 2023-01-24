@@ -54,4 +54,5 @@ dependencies {
     composeTest()
     androidXTest()
     composeMaterial()
+    moduleDependency(":data:common")
 }

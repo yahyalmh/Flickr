@@ -9,18 +9,18 @@ import java.util.*
 
 fun flickrDetailResponse(photo: PhotoDetailModel = photoDetailModel()) = DetailResponse(
     photo = photo,
-    stat = RandomString.next()
+    stat = RandomString()
 )
 
 fun photoDetailModel() = PhotoDetailModel(
-    id = RandomString.next(),
-    secret = RandomString.next(),
-    server = RandomString.next(),
+    id = RandomString(),
+    secret = RandomString(),
+    server = RandomString(),
     views = Random().nextInt(),
-    owner = OwnerModel(RandomString.next()),
+    owner = OwnerModel(RandomString()),
     title = Title(),
     usage = UsageModel(canDownload = 1, canBlog = 1, canPrint = 1, canShare = 1),
-    description = DescriptionModel(RandomString.next()),
+    description = DescriptionModel( RandomString()),
     visibility = Visibility(isPublic = 1, isFriend = 1, isFamily = 1),
     dates = DatesModel(),
     tags = Tags(),
@@ -31,7 +31,7 @@ fun photoDetailModel() = PhotoDetailModel(
 
 fun flickrSearchResponse(photos: PhotosModel = photosModelStub()) = SearchResponse(
     photos = photos,
-    stat = RandomString.next()
+    stat = RandomString()
 )
 
 fun photoModelListStub(count: Int = 10): List<PhotoModel> {
@@ -51,13 +51,13 @@ fun photosModelStub() = PhotosModel(
 )
 
 fun photoModelStub() = PhotoModel(
-    id = RandomString.next(),
-    owner = RandomString.next(),
-    secret = RandomString.next(),
-    server = RandomString.next(),
-    farm = RandomString.next(),
-    title = RandomString.next(),
-    isPublic = RandomString.next(),
-    isFriend = RandomString.next(),
-    isFamily = RandomString.next(),
+    id = RandomString(),
+    owner = RandomString(),
+    secret = RandomString(),
+    server = RandomString(),
+    farm = RandomString(),
+    title = RandomString(),
+    isPublic = RandomString(),
+    isFriend = RandomString(),
+    isFamily = RandomString(),
 )

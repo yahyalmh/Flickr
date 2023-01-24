@@ -1,8 +1,9 @@
 package com.example.data.common.ext
 
 object RandomString {
-    fun next(length: Int = 10, withNumbers: Boolean = true): String {
-        val charsSet = (('A'..'Z') + ('a'..'z')).toMutableList()
+    private val charsSet = (('A'..'Z') + ('a'..'z')).toMutableList()
+
+    operator fun invoke(length: Int = 10, withNumbers: Boolean = true): String {
         if (withNumbers) {
             charsSet += ('0'..'9')
         }
