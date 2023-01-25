@@ -79,8 +79,10 @@ class SearchViewModel @Inject constructor(
     @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
     private fun observeSearchQueryChange() {
         val searchDelayInterval: Long = 300
-        searchFlow.debounce(searchDelayInterval).filter { it.isNotEmpty() && it.isNotBlank() }
-            .distinctUntilChanged { old, new -> isValuesDistinct(old, new) }.mapLatest { query ->
+        searchFlow.debounce(searchDelayInterval)
+            .filter { it.isNotEmpty() && it.isNotBlank() }
+            .distinctUntilChanged { old, new -> isValuesDistinct(old, new) }
+            .mapLatest { query ->
                 cancelFetchDataJob()
                 searchQuery(query)
             }.launchIn(viewModelScope)
@@ -109,7 +111,8 @@ class SearchViewModel @Inject constructor(
         ) { result, bookmarks ->
             setLoadedStat(result, query, bookmarks)
         }.onStart { setState(Loading(query = query, state.value.result)) }
-            .retryWithPolicy { e -> handleAutoRetry(e) }.catch { e -> handleError(e) }
+            .retryWithPolicy { e -> handleAutoRetry(e) }
+            .catch { e -> handleError(e) }
             .launchIn(viewModelScope)
     }
 
@@ -158,27 +161,37 @@ class SearchViewModel @Inject constructor(
         }
     }
 
-    private fun handleBookmark(photo: Photo) {
-        viewModelScope.launch {
-            val bookmarkedPhotos = bookmarksInteractor.getBookmarks().firstOrNull()
-            val isPhotoNotBookmarked =
-                bookmarkedPhotos.isNullOrEmpty() || bookmarkedPhotos.all { it.id != photo.id }
+    private fun handleBookmark(photo: Photo) = viewModelScope.launch {
+        bookmarksInteractor
+            .getBookmarks()
+            .firstOrNull()
+            ?.find { it.id == photo.id }
+            .let { photoEntity ->
 
-            if (isPhotoNotBookmarked) {
-                val imageFileAddress = imageDownloader.downloadToFiles(
-                    imageUrl = photo.getImageUrl(), fileName = photo.id
-                )
-                val photoEntity = photo.toEntity(localAddress = imageFileAddress)
-                bookmarksInteractor.addBookmark(photoEntity)
-                println(imageFileAddress)
-            } else {
-                bookmarkedPhotos?.find { it.id == photo.id }?.let {
-                        File(it.localAddress).delete()
-                        bookmarksInteractor.removeBookmark(it)
-                    }
+                if (photoEntity == null) {
+                    addBookmark(photo)
+                } else {
+                    removeBookmark(photoEntity)
+                }
             }
+    }
+
+    private suspend fun removeBookmark(photoEntity: PhotoEntity) {
+        val isImageFileDeleted = File(photoEntity.localAddress).delete()
+        if (isImageFileDeleted) {
+            bookmarksInteractor.removeBookmark(photoEntity)
         }
     }
+
+    private suspend fun addBookmark(photo: Photo) {
+        imageDownloader.downloadToFiles(
+            imageUrl = photo.getImageUrl(),
+            fileName = photo.id
+        )?.let { imageAddress ->
+            bookmarksInteractor.addBookmark(photo.toEntity(localAddress = imageAddress))
+        }
+    }
+
 
     private fun fetchNextPage() {
         if (state.value.isLoading && state.value.isPagination) {
