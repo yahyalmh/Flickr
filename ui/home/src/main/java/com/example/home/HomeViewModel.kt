@@ -3,7 +3,10 @@ package com.example.home
 import androidx.lifecycle.viewModelScope
 import com.example.bookmark.BookmarksInteractor
 import com.example.data.common.database.bookmark.PhotoEntity
-import com.example.home.HomeUiState.*
+import com.example.home.HomeUiState.Empty
+import com.example.home.HomeUiState.Loaded
+import com.example.home.HomeUiState.Loading
+import com.example.home.HomeUiState.Retry
 import com.example.home.nav.HomeRoute
 import com.example.ui.common.BaseViewModel
 import com.example.ui.common.UIEvent
@@ -13,6 +16,7 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 import java.io.File
 import javax.inject.Inject
@@ -29,6 +33,7 @@ open class HomeViewModel @Inject constructor(
 
     private fun fetchBookmarked() {
         bookmarksInteractor.getBookmarks()
+            .onStart { setState(Loading) }
             .onEach { photos ->
                 when {
                     photos.isEmpty() -> setState(Empty)
@@ -43,10 +48,7 @@ open class HomeViewModel @Inject constructor(
 
     override fun onEvent(event: HomeUiEvent) {
         when (event) {
-            HomeUiEvent.OnRetry -> {
-                setState(Loading)
-                fetchBookmarked()
-            }
+            HomeUiEvent.OnRetry -> fetchBookmarked()
             is HomeUiEvent.OnBookmarkClick -> handleBookmark(event.photoId)
             HomeUiEvent.OnSearchClick -> homeRoute.navigateToSearch()
             is HomeUiEvent.OnPhotoClick -> homeRoute.navigateToDetail(event.photoId)

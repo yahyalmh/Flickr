@@ -9,7 +9,14 @@ import com.example.data.common.model.Photo
 import com.example.data.common.model.toEntity
 import com.example.filckrsearch.search.FlickrSearchInteractor
 import com.example.history.SearchHistoryInteractor
-import com.example.search.SearchUiState.*
+import com.example.search.SearchUiState.AutoRetry
+import com.example.search.SearchUiState.DataLoaded
+import com.example.search.SearchUiState.Empty
+import com.example.search.SearchUiState.HistoryLoaded
+import com.example.search.SearchUiState.Loading
+import com.example.search.SearchUiState.Pagination
+import com.example.search.SearchUiState.Retry
+import com.example.search.SearchUiState.Start
 import com.example.search.nav.SearchRoute
 import com.example.ui.common.BaseViewModel
 import com.example.ui.common.UIEvent
@@ -20,7 +27,16 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.mapLatest
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 import java.io.File
 import javax.inject.Inject
@@ -46,31 +62,25 @@ class SearchViewModel @Inject constructor(
     }
 
     private fun fetchSearchHistory() {
-        viewModelScope.launch {
-            combine(
-                searchFlow.onStart { emit("") },
-                searchHistoryInteractor.getHistories()
-            ) { query, history ->
-                if (query.isBlank() && query.isEmpty()) {
-                    cancelFetchDataJob()
-                    if (history.isEmpty().not()) {
-                        setState(HistoryLoaded(history))
-                    } else {
-                        setState(Start)
-                    }
+        combine(
+            searchFlow.onStart { emit("") }, searchHistoryInteractor.getHistories()
+        ) { query, history ->
+            if (query.isBlank() && query.isEmpty()) {
+                cancelFetchDataJob()
+                if (history.isEmpty().not()) {
+                    setState(HistoryLoaded(history))
+                } else {
+                    setState(Start)
                 }
-            }.launchIn(viewModelScope)
-        }
+            }
+        }.launchIn(viewModelScope)
     }
 
     @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
     private fun observeSearchQueryChange() {
         val searchDelayInterval: Long = 300
-        searchFlow
-            .debounce(searchDelayInterval)
-            .filter { it.isNotEmpty() && it.isNotBlank() }
-            .distinctUntilChanged { old, new -> isValuesDistinct(old, new) }
-            .mapLatest { query ->
+        searchFlow.debounce(searchDelayInterval).filter { it.isNotEmpty() && it.isNotBlank() }
+            .distinctUntilChanged { old, new -> isValuesDistinct(old, new) }.mapLatest { query ->
                 cancelFetchDataJob()
                 searchQuery(query)
             }.launchIn(viewModelScope)
@@ -93,34 +103,28 @@ class SearchViewModel @Inject constructor(
     }
 
     private fun searchQuery(query: String) {
-        setState(Loading(query = query, state.value.result))
         fetchDataJob = combine(
             flickrSearchInteractor.search(query = query, page = 1, perPage = defaultPageSize),
             bookmarksInteractor.getBookmarks()
         ) { result, bookmarks ->
             setLoadedStat(result, query, bookmarks)
-        }
-            .retryWithPolicy { e -> handleAutoRetry(e) }
-            .catch { e -> handleError(e) }
+        }.onStart { setState(Loading(query = query, state.value.result)) }
+            .retryWithPolicy { e -> handleAutoRetry(e) }.catch { e -> handleError(e) }
             .launchIn(viewModelScope)
     }
 
     private fun setLoadedStat(
-        result: List<Photo>,
-        query: String,
-        bookmarks: List<PhotoEntity>
-    ) {
-        when {
-            result.isEmpty() -> setState(Empty(query))
-            else -> {
-                setState(
-                    DataLoaded(
-                        result = result,
-                        bookmarkedPhotos = bookmarks,
-                        query = query,
-                    )
+        result: List<Photo>, query: String, bookmarks: List<PhotoEntity>
+    ) = when {
+        result.isEmpty() -> setState(Empty(query))
+        else -> {
+            setState(
+                DataLoaded(
+                    result = result,
+                    bookmarkedPhotos = bookmarks,
+                    query = query,
                 )
-            }
+            )
         }
     }
 
@@ -139,10 +143,16 @@ class SearchViewModel @Inject constructor(
             is SearchUiEvent.OnBookmark -> handleBookmark(event.photo)
             SearchUiEvent.ClosSearch -> searchRoute.popBackStack()
             is SearchUiEvent.OnHistoryClick -> searchFlow.tryEmit(event.history)
-            is SearchUiEvent.OnClearHistoryClick ->
-                viewModelScope.launch { searchHistoryInteractor.removeHistory(event.history) }
-            is SearchUiEvent.OnSaveSearch ->
-                viewModelScope.launch { searchHistoryInteractor.addHistory(event.text) }
+            is SearchUiEvent.OnClearHistoryClick -> viewModelScope.launch {
+                searchHistoryInteractor.removeHistory(
+                    event.history
+                )
+            }
+            is SearchUiEvent.OnSaveSearch -> viewModelScope.launch {
+                searchHistoryInteractor.addHistory(
+                    event.text
+                )
+            }
             SearchUiEvent.OnPagination -> fetchNextPage()
             is SearchUiEvent.OnPhotoClick -> searchRoute.navigateToDetail(event.photoId)
         }
@@ -156,15 +166,13 @@ class SearchViewModel @Inject constructor(
 
             if (isPhotoNotBookmarked) {
                 val imageFileAddress = imageDownloader.downloadToFiles(
-                    imageUrl = photo.getImageUrl(),
-                    fileName = photo.id
+                    imageUrl = photo.getImageUrl(), fileName = photo.id
                 )
                 val photoEntity = photo.toEntity(localAddress = imageFileAddress)
                 bookmarksInteractor.addBookmark(photoEntity)
                 println(imageFileAddress)
             } else {
-                bookmarkedPhotos?.find { it.id == photo.id }
-                    ?.let {
+                bookmarkedPhotos?.find { it.id == photo.id }?.let {
                         File(it.localAddress).delete()
                         bookmarksInteractor.removeBookmark(it)
                     }
@@ -176,20 +184,17 @@ class SearchViewModel @Inject constructor(
         if (state.value.isLoading && state.value.isPagination) {
             return
         }
-        setState(Pagination(state.value.query, state.value.result))
         fetchDataJob = combine(
             flickrSearchInteractor.search(
                 query = state.value.query,
                 page = paginationStartPageNumber,
                 perPage = defaultPageSize
-            ),
-            bookmarksInteractor.getBookmarks()
+            ), bookmarksInteractor.getBookmarks()
         ) { result, bookmarks ->
             paginationStartPageNumber += 1
             setLoadedStat(state.value.result + result, state.value.query, bookmarks)
-        }
-            .retryWithPolicy { e -> handleAutoRetry(e) }
-            .catch { e -> handleError(e) }
+        }.onStart { setState(Pagination(state.value.query, state.value.result)) }
+            .retryWithPolicy { e -> handleAutoRetry(e) }.catch { e -> handleError(e) }
             .launchIn(viewModelScope)
     }
 }
@@ -232,35 +237,25 @@ sealed class SearchUiState(
         SearchUiState(isPagination = true, query = query, result = result)
 
     class Retry(retryMsg: String? = null, query: String) : SearchUiState(
-        isRetry = true,
-        retryMsg = retryMsg,
-        isKeyboardHidden = true,
-        query = query
+        isRetry = true, retryMsg = retryMsg, isKeyboardHidden = true, query = query
     )
 
     class AutoRetry(autoRetryMsg: String? = null, query: String) : SearchUiState(
-        isAutoRetry = true,
-        isKeyboardHidden = true,
-        autoRetryMsg = autoRetryMsg,
-        query = query
+        isAutoRetry = true, isKeyboardHidden = true, autoRetryMsg = autoRetryMsg, query = query
     )
 
     class DataLoaded(
         result: List<Photo>,
         bookmarkedPhotos: List<PhotoEntity>,
         query: String,
-    ) :
-        SearchUiState(
-            isLoaded = true,
-            result = result,
-            bookmarkedPhotos = bookmarkedPhotos,
-            query = query,
-        )
+    ) : SearchUiState(
+        isLoaded = true,
+        result = result,
+        bookmarkedPhotos = bookmarkedPhotos,
+        query = query,
+    )
 
-    class HistoryLoaded(histories: List<SearchHistoryEntity>) :
-        SearchUiState(
-            isShowingHistory = true,
-            histories = histories,
-            query = ""
-        )
+    class HistoryLoaded(histories: List<SearchHistoryEntity>) : SearchUiState(
+        isShowingHistory = true, histories = histories, query = ""
+    )
 }
