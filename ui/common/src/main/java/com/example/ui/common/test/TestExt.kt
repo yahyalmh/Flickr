@@ -5,6 +5,7 @@ import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.AndroidComposeTestRule
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flow
 import org.junit.rules.TestRule
 import org.mockito.stubbing.OngoingStubbing
@@ -14,7 +15,7 @@ fun <T : Any> OngoingStubbing<Flow<T>>.thenEmitError(e: Throwable) {
 }
 
 fun <T : Any> OngoingStubbing<Flow<T>>.thenEmitNothing() {
-    thenReturn(flow {})
+    thenReturn(emptyFlow())
 }
 
 fun <R : TestRule, T : ComponentActivity> AndroidComposeTestRule<R, T>.wait(timeoutMillis: Long) =
