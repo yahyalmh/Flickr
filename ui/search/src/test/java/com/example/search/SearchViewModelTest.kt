@@ -3,7 +3,6 @@ package com.example.search
 import com.example.bookmark.BookmarksInteractorImpl
 import com.example.data.common.database.bookmark.PhotoEntity
 import com.example.data.common.database.history.SearchHistoryEntity
-import com.example.data.common.ext.RandomString
 import com.example.data.common.model.Photo
 import com.example.data.common.model.toEntity
 import com.example.filckrsearch.search.FlickrSearchInteractorImpl
@@ -16,6 +15,7 @@ import com.example.ui.common.test.MainDispatcherRule
 import com.example.ui.common.test.thenEmitError
 import com.example.ui.common.test.thenEmitNothing
 import com.example.ui.common.utility.ImageDownloader
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
@@ -23,15 +23,21 @@ import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.currentTime
 import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.withContext
 import org.junit.Rule
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
+import org.junit.jupiter.api.io.TempDir
 import org.mockito.Mock
 import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.*
 import java.io.IOException
+import java.nio.file.Files
+import java.nio.file.Path
+import java.util.*
+
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @ExtendWith(MockitoExtension::class, MainDispatcherRule::class)
@@ -219,35 +225,44 @@ internal class SearchViewModelTest {
     }
 
     @Test
-    fun `GIVEN bookmark event THEN item added or removed from bookmarks`() = runTest {
-        whenever(flickrSearchInteractor.search(any(), any(), any())).thenReturn(flowOf(photosStub))
-        whenever(bookmarksInteractor.getBookmarks()).thenReturn(flowOf(bookmarkedPhotos))
-        whenever(searchHistoryInteractor.getHistories()).thenEmitNothing()
-        val randomFileAddress = RandomString()
-        whenever(imageDownloader.downloadToFiles(any(), any())).thenReturn(randomFileAddress)
+    fun `GIVEN bookmark event THEN item added or removed from bookmarks`(@TempDir tempDir: Path) =
+        runTest {
+            whenever(flickrSearchInteractor.search(any(), any(), any())).thenReturn(
+                flowOf(
+                    photosStub
+                )
+            )
+            whenever(bookmarksInteractor.getBookmarks()).thenReturn(flowOf(bookmarkedPhotos))
+            whenever(searchHistoryInteractor.getHistories()).thenEmitNothing()
 
-        searchViewModel = SearchViewModel(
-            flickrSearchInteractor = flickrSearchInteractor,
-            bookmarksInteractor = bookmarksInteractor,
-            searchRoute = searchRoute,
-            imageDownloader = imageDownloader,
-            searchHistoryInteractor = searchHistoryInteractor
-        )
-        searchViewModel.searchFlow.emit(sampleQuery)
-        advanceUntilIdle()
-        Assertions.assertTrue(searchViewModel.state.value is DataLoaded)
+            val tmpImageFileAddress = withContext(Dispatchers.IO) {
+                Files.createFile(tempDir.resolve("image.jpeg"))
+            }.toString()
 
-        searchViewModel.onEvent(OnBookmark(photosStub.last()))
-        advanceUntilIdle()
+            whenever(imageDownloader.downloadToFiles(any(), any())).thenReturn(tmpImageFileAddress)
 
-        verify(bookmarksInteractor).addBookmark(any())
+            searchViewModel = SearchViewModel(
+                flickrSearchInteractor = flickrSearchInteractor,
+                bookmarksInteractor = bookmarksInteractor,
+                searchRoute = searchRoute,
+                imageDownloader = imageDownloader,
+                searchHistoryInteractor = searchHistoryInteractor
+            )
+            searchViewModel.searchFlow.emit(sampleQuery)
+            advanceUntilIdle()
+            Assertions.assertTrue(searchViewModel.state.value is DataLoaded)
 
-        val expected = photosStub.last().toEntity(randomFileAddress)
-        bookmarkedPhotos.add(expected)
+            searchViewModel.onEvent(OnBookmark(photosStub.last()))
+            advanceUntilIdle()
 
-        searchViewModel.onEvent(OnBookmark(photosStub.last()))
-        advanceUntilIdle()
+            verify(bookmarksInteractor).addBookmark(any())
 
-        verify(bookmarksInteractor).removeBookmark(bookmarkedPhotos.last())
-    }
+            val expected = photosStub.last().toEntity(tmpImageFileAddress)
+            bookmarkedPhotos.add(expected)
+
+            searchViewModel.onEvent(OnBookmark(photosStub.last()))
+            advanceUntilIdle()
+
+            verify(bookmarksInteractor).removeBookmark(bookmarkedPhotos.last())
+        }
 }
