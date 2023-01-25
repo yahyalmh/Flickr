@@ -24,7 +24,7 @@ class ImageDownloader @Inject constructor(
 ) {
     private lateinit var downloadJob: Deferred<ImageResult>
 
-    suspend fun downloadToFiles(imageUrl: String, fileName: String): String =
+    suspend fun downloadToFiles(imageUrl: String, fileName: String): String? =
         withContext(Dispatchers.IO) {
             cancelCurrentJobIfExist()
             val request = ImageRequest.Builder(context)
@@ -34,7 +34,7 @@ class ImageDownloader @Inject constructor(
 
             return@withContext when (val result = downloadJob.await()) {
                 is SuccessResult -> saveToFiles(result.drawable, fileName)
-                is ErrorResult -> throw result.throwable
+                is ErrorResult -> null
             }
         }
 
@@ -44,12 +44,17 @@ class ImageDownloader @Inject constructor(
         }
     }
 
-    private fun saveToFiles(drawable: Drawable, fileName: String): String {
-        val bitmap = (drawable as BitmapDrawable).bitmap
-        val file = File(context.filesDir, "$fileName.jpeg")
-        FileOutputStream(file).use {
-            bitmap.compress(CompressFormat.JPEG, 100, it)
+    private fun saveToFiles(drawable: Drawable, fileName: String): String? {
+        return try {
+            val bitmap = (drawable as BitmapDrawable).bitmap
+            File(context.filesDir, "$fileName.jpeg").run {
+                FileOutputStream(this).use {
+                    bitmap.compress(CompressFormat.JPEG, 100, it)
+                }
+                absolutePath
+            }
+        } catch (e: Exception) {
+            null
         }
-        return file.absolutePath
     }
 }
