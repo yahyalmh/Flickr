@@ -50,7 +50,7 @@ internal class HomeViewModelTest {
         )
 
         homeViewModel = HomeViewModel(bookmarksInteractor, homeRoute)
-        val uiState = homeViewModel.state.value
+        val uiState = homeViewModel.state
 
         Assertions.assertTrue(uiState is HomeUiState.Loaded)
         Assertions.assertEquals(photoEntities, uiState.bookmarkedPhotos)
@@ -66,10 +66,10 @@ internal class HomeViewModelTest {
             })
 
         homeViewModel = HomeViewModel(bookmarksInteractor, homeRoute)
-        Assertions.assertTrue(homeViewModel.state.value is HomeUiState.Loading)
+        Assertions.assertTrue(homeViewModel.state is HomeUiState.Loading)
 
         advanceUntilIdle()
-        Assertions.assertTrue(homeViewModel.state.value is HomeUiState.Loaded)
+        Assertions.assertTrue(homeViewModel.state is HomeUiState.Loaded)
     }
 
     @Test
@@ -79,7 +79,7 @@ internal class HomeViewModelTest {
         homeViewModel = HomeViewModel(bookmarksInteractor, homeRoute)
 
         advanceUntilIdle()
-        Assertions.assertTrue(homeViewModel.state.value is HomeUiState.Retry)
+        Assertions.assertTrue(homeViewModel.state is HomeUiState.Retry)
     }
 
 
@@ -89,13 +89,13 @@ internal class HomeViewModelTest {
 
         homeViewModel = HomeViewModel(bookmarksInteractor, homeRoute)
         advanceUntilIdle()
-        Assertions.assertTrue(homeViewModel.state.value is HomeUiState.Retry)
+        Assertions.assertTrue(homeViewModel.state is HomeUiState.Retry)
 
         whenever(bookmarksInteractor.getBookmarks()).thenReturn(flowOf(photoEntities))
         homeViewModel.onEvent(HomeUiEvent.OnRetry)
 
         advanceUntilIdle()
-        Assertions.assertTrue(homeViewModel.state.value is HomeUiState.Loaded)
+        Assertions.assertTrue(homeViewModel.state is HomeUiState.Loaded)
     }
 
     @Test
@@ -104,7 +104,7 @@ internal class HomeViewModelTest {
 
         homeViewModel = HomeViewModel(bookmarksInteractor, homeRoute)
         advanceUntilIdle()
-        Assertions.assertTrue(homeViewModel.state.value is HomeUiState.Loaded)
+        Assertions.assertTrue(homeViewModel.state is HomeUiState.Loaded)
 
         homeViewModel.onEvent(HomeUiEvent.OnBookmarkClick(photoEntities.last().id))
         advanceUntilIdle()

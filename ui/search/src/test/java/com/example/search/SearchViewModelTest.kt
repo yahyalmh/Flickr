@@ -11,12 +11,14 @@ import com.example.search.SearchUiEvent.*
 import com.example.search.SearchUiState.*
 import com.example.search.SearchUiState.Retry
 import com.example.search.nav.SearchRoute
+import com.example.ui.common.connectivity.ConnectivityMonitor
 import com.example.ui.common.test.MainDispatcherRule
 import com.example.ui.common.test.thenEmitError
 import com.example.ui.common.test.thenEmitNothing
 import com.example.ui.common.utility.ImageDownloader
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.advanceTimeBy
@@ -61,6 +63,9 @@ internal class SearchViewModelTest {
     @Mock
     private lateinit var imageDownloader: ImageDownloader
 
+    @Mock
+    private lateinit var connectivityMonitor: ConnectivityMonitor
+
     private lateinit var searchViewModel: SearchViewModel
 
 
@@ -76,19 +81,24 @@ internal class SearchViewModelTest {
         searchHistories = searchHistoriesEntityStub()
     }
 
+    private fun initializeViewmodel() {
+        searchViewModel = SearchViewModel(
+            flickrSearchInteractor = flickrSearchInteractor,
+            bookmarksInteractor = bookmarksInteractor,
+            searchRoute = searchRoute,
+            imageDownloader = imageDownloader,
+            searchHistoryInteractor = searchHistoryInteractor,
+            connectivityMonitor = connectivityMonitor,
+        )
+    }
+
     @Test
     fun `Given start searching WHEN there is search history THEN first state is histories`() =
         runTest {
             whenever(searchHistoryInteractor.getHistories()).thenReturn(flowOf(searchHistories))
 
-            searchViewModel = SearchViewModel(
-                flickrSearchInteractor = flickrSearchInteractor,
-                bookmarksInteractor = bookmarksInteractor,
-                searchRoute = searchRoute,
-                imageDownloader = imageDownloader,
-                searchHistoryInteractor = searchHistoryInteractor
-            )
-            Assertions.assertTrue(searchViewModel.state.value is HistoryLoaded)
+            initializeViewmodel()
+            Assertions.assertTrue(searchViewModel.state is HistoryLoaded)
         }
 
     @Test
@@ -96,14 +106,8 @@ internal class SearchViewModelTest {
         runTest {
             whenever(searchHistoryInteractor.getHistories()).thenReturn(flowOf(emptyList()))
 
-            searchViewModel = SearchViewModel(
-                flickrSearchInteractor = flickrSearchInteractor,
-                bookmarksInteractor = bookmarksInteractor,
-                searchRoute = searchRoute,
-                imageDownloader = imageDownloader,
-                searchHistoryInteractor = searchHistoryInteractor
-            )
-            Assertions.assertTrue(searchViewModel.state.value is Start)
+            initializeViewmodel()
+            Assertions.assertTrue(searchViewModel.state is Start)
         }
 
     @Test
@@ -112,17 +116,11 @@ internal class SearchViewModelTest {
         whenever(searchHistoryInteractor.getHistories()).thenReturn(flowOf(searchHistories))
         whenever(bookmarksInteractor.getBookmarks()).thenReturn(flowOf(bookmarkedPhotos))
 
-        searchViewModel = SearchViewModel(
-            flickrSearchInteractor = flickrSearchInteractor,
-            bookmarksInteractor = bookmarksInteractor,
-            searchRoute = searchRoute,
-            imageDownloader = imageDownloader,
-            searchHistoryInteractor = searchHistoryInteractor
-        )
+        initializeViewmodel()
         searchViewModel.searchFlow.emit(sampleQuery)
         advanceUntilIdle()
 
-        val uiState = searchViewModel.state.value
+        val uiState = searchViewModel.state
         Assertions.assertEquals(photosStub, uiState.result)
         Assertions.assertEquals(bookmarkedPhotos, uiState.bookmarkedPhotos)
         Assertions.assertFalse(uiState.isLoading)
@@ -134,85 +132,78 @@ internal class SearchViewModelTest {
         whenever(searchHistoryInteractor.getHistories()).thenEmitNothing()
         whenever(flickrSearchInteractor.search(any(), any(), any()))
             .thenReturn(flow { throw IOException() })
+        whenever(connectivityMonitor.isOnline).thenReturn(flow {
+            emit(false)
+            delay(1000)
+            emit(true)
+        })
 
-        searchViewModel = SearchViewModel(
-            flickrSearchInteractor = flickrSearchInteractor,
-            bookmarksInteractor = bookmarksInteractor,
-            searchRoute = searchRoute,
-            imageDownloader = imageDownloader,
-            searchHistoryInteractor = searchHistoryInteractor
-        )
+        initializeViewmodel()
         searchViewModel.searchFlow.emit(sampleQuery)
         advanceTimeBy(1000)
-        Assertions.assertTrue(searchViewModel.state.value is AutoRetry)
+        Assertions.assertTrue(searchViewModel.state is AutoRetry)
     }
 
     @Test
     fun `WHEN searching returns error THEN state is AutoRetry THEN state is Loaded`() = runTest {
         whenever(bookmarksInteractor.getBookmarks()).thenReturn(flowOf(bookmarkedPhotos))
         whenever(searchHistoryInteractor.getHistories()).thenEmitNothing()
-        val time = currentTime // while running all test the time will be accumulated
+        val waitTime = currentTime + 1000
+        whenever(connectivityMonitor.isOnline).thenReturn(flow {
+            emit(false)
+            delay(1000)
+            emit(true)
+        })
         whenever(flickrSearchInteractor.search(any(), any(), any()))
             .thenReturn(flow {
-                if (currentTime < time + 3000) {
+                if (currentTime < waitTime) {
                     throw IOException()
                 } else {
                     emit(photosStub)
                 }
             })
 
-        searchViewModel = SearchViewModel(
-            flickrSearchInteractor = flickrSearchInteractor,
-            bookmarksInteractor = bookmarksInteractor,
-            searchRoute = searchRoute,
-            imageDownloader = imageDownloader,
-            searchHistoryInteractor = searchHistoryInteractor
-        )
+        initializeViewmodel()
         searchViewModel.searchFlow.emit(sampleQuery)
         advanceTimeBy(1000)
-        Assertions.assertTrue(searchViewModel.state.value is AutoRetry)
+        Assertions.assertTrue(searchViewModel.state is AutoRetry)
 
-        advanceTimeBy(4000)
         advanceUntilIdle()
-        Assertions.assertTrue(searchViewModel.state.value is DataLoaded)
+        Assertions.assertTrue(searchViewModel.state is DataLoaded)
     }
-
 
     @Test
-    fun `WHEN  searching returns error THEN after a while state is Retry`() = runTest {
-        whenever(flickrSearchInteractor.search(any(), any(), any())).thenEmitError(IOException())
-        whenever(bookmarksInteractor.getBookmarks()).thenEmitNothing()
+    fun `WHEN searching returns error THEN state is AutoRetry THEN state is Retry`() = runTest {
+        whenever(bookmarksInteractor.getBookmarks()).thenReturn(flowOf(bookmarkedPhotos))
         whenever(searchHistoryInteractor.getHistories()).thenEmitNothing()
+        whenever(connectivityMonitor.isOnline).thenReturn(flow {
+            emit(false)
+            delay(1000)
+            emit(true)
+        })
+        whenever(flickrSearchInteractor.search(any(), any(), any()))
+            .thenReturn(flow {
+                throw IOException()
+            })
 
-        searchViewModel = SearchViewModel(
-            flickrSearchInteractor = flickrSearchInteractor,
-            bookmarksInteractor = bookmarksInteractor,
-            searchRoute = searchRoute,
-            imageDownloader = imageDownloader,
-            searchHistoryInteractor = searchHistoryInteractor
-        )
+        initializeViewmodel()
         searchViewModel.searchFlow.emit(sampleQuery)
         advanceTimeBy(1000)
-        Assertions.assertTrue(searchViewModel.state.value is AutoRetry)
+        Assertions.assertTrue(searchViewModel.state is AutoRetry)
 
         advanceUntilIdle()
-        Assertions.assertTrue(searchViewModel.state.value is Retry)
+        Assertions.assertTrue(searchViewModel.state is Retry)
     }
+
 
     @Test
     fun `GIVEN retry event THEN data load successfully`() = runTest {
         whenever(flickrSearchInteractor.search(any(), any(), any())).thenEmitError(IOException())
 
-        searchViewModel = SearchViewModel(
-            flickrSearchInteractor = flickrSearchInteractor,
-            bookmarksInteractor = bookmarksInteractor,
-            searchRoute = searchRoute,
-            imageDownloader = imageDownloader,
-            searchHistoryInteractor = searchHistoryInteractor
-        )
+        initializeViewmodel()
         searchViewModel.searchFlow.emit(sampleQuery)
         advanceUntilIdle()
-        Assertions.assertTrue(searchViewModel.state.value is Retry)
+        Assertions.assertTrue(searchViewModel.state is Retry)
 
         whenever(flickrSearchInteractor.search(any(), any(), any())).thenReturn(
             flowOf(photosStub)
@@ -221,7 +212,7 @@ internal class SearchViewModelTest {
         searchViewModel.onEvent(SearchUiEvent.Retry)
 
         advanceUntilIdle()
-        Assertions.assertTrue(searchViewModel.state.value is DataLoaded)
+        Assertions.assertTrue(searchViewModel.state is DataLoaded)
     }
 
     @Test
@@ -240,17 +231,10 @@ internal class SearchViewModelTest {
             }.toString()
 
             whenever(imageDownloader.downloadToFiles(any(), any())).thenReturn(tmpImageFileAddress)
-
-            searchViewModel = SearchViewModel(
-                flickrSearchInteractor = flickrSearchInteractor,
-                bookmarksInteractor = bookmarksInteractor,
-                searchRoute = searchRoute,
-                imageDownloader = imageDownloader,
-                searchHistoryInteractor = searchHistoryInteractor
-            )
+            initializeViewmodel()
             searchViewModel.searchFlow.emit(sampleQuery)
             advanceUntilIdle()
-            Assertions.assertTrue(searchViewModel.state.value is DataLoaded)
+            Assertions.assertTrue(searchViewModel.state is DataLoaded)
 
             searchViewModel.onEvent(OnBookmark(photosStub.last()))
             advanceUntilIdle()
