@@ -27,15 +27,18 @@ fun <T> Flow<T>.retryWithPolicy(
 
 fun <T> Flow<T>.retryOnNetworkConnection(
     connectivityMonitor: ConnectivityMonitor,
-    retryHandler: (e: Throwable) -> Unit
+    retryHandler: ((e: Throwable) -> Unit)? = null
 ): Flow<T> = flow {
     val exception = catchError(this)
     if (exception != null && exception is IOException) {
-        retryHandler(exception)
+        if (retryHandler != null) {
+            retryHandler(exception)
+        }
         connectivityMonitor
             .isOnline
             .distinctUntilChanged()
-            .collectLatest { isOnline ->
+            .first { it }
+            .let { isOnline ->
                 if (isOnline) {
                     collect()
                 }

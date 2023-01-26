@@ -21,7 +21,8 @@ import com.example.search.nav.SearchRoute
 import com.example.ui.common.BaseViewModel
 import com.example.ui.common.UIEvent
 import com.example.ui.common.UIState
-import com.example.ui.common.ext.retryWithPolicy
+import com.example.ui.common.connectivity.ConnectivityMonitor
+import com.example.ui.common.ext.retryOnNetworkConnection
 import com.example.ui.common.utility.ImageDownloader
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -48,6 +49,7 @@ class SearchViewModel @Inject constructor(
     private val searchRoute: SearchRoute,
     private val imageDownloader: ImageDownloader,
     private val searchHistoryInteractor: SearchHistoryInteractor,
+    private val connectivityMonitor: ConnectivityMonitor,
 ) : BaseViewModel<SearchUiState, SearchUiEvent>(Start) {
     @VisibleForTesting
     val searchFlow = MutableSharedFlow<String>(extraBufferCapacity = 1)
@@ -90,7 +92,7 @@ class SearchViewModel @Inject constructor(
 
     private fun isValuesDistinct(old: String, new: String): Boolean {
         // Search the same value in the retry and history view
-        val shouldSearchSameValue = state.value.isRetry || state.value.isShowingHistory
+        val shouldSearchSameValue = state.isRetry || state.isShowingHistory
         return if (old == new && shouldSearchSameValue) {
             false
         } else {
@@ -110,8 +112,8 @@ class SearchViewModel @Inject constructor(
             bookmarksInteractor.getBookmarks()
         ) { result, bookmarks ->
             setLoadedStat(result, query, bookmarks)
-        }.onStart { setState(Loading(query = query, state.value.result)) }
-            .retryWithPolicy { e -> handleAutoRetry(e) }
+        }.onStart { setState(Loading(query = query, state.result)) }
+            .retryOnNetworkConnection(connectivityMonitor) { e -> handleAutoRetry(e) }
             .catch { e -> handleError(e) }
             .launchIn(viewModelScope)
     }
@@ -132,29 +134,25 @@ class SearchViewModel @Inject constructor(
     }
 
     private fun handleError(e: Throwable) {
-        setState(Retry(e.message, query = state.value.query))
+        setState(Retry(e.message, query = state.query))
     }
 
     private fun handleAutoRetry(e: Throwable) {
-        setState(AutoRetry(e.message, query = state.value.query))
+        setState(AutoRetry(e.message, query = state.query))
     }
 
     override fun onEvent(event: SearchUiEvent) {
         when (event) {
-            SearchUiEvent.Retry -> searchFlow.tryEmit(state.value.query)
+            SearchUiEvent.Retry -> searchFlow.tryEmit(state.query)
             is SearchUiEvent.QueryChange -> searchFlow.tryEmit(event.text)
             is SearchUiEvent.OnBookmark -> handleBookmark(event.photo)
             SearchUiEvent.ClosSearch -> searchRoute.popBackStack()
             is SearchUiEvent.OnHistoryClick -> searchFlow.tryEmit(event.history)
             is SearchUiEvent.OnClearHistoryClick -> viewModelScope.launch {
-                searchHistoryInteractor.removeHistory(
-                    event.history
-                )
+                searchHistoryInteractor.removeHistory(event.history)
             }
             is SearchUiEvent.OnSaveSearch -> viewModelScope.launch {
-                searchHistoryInteractor.addHistory(
-                    event.text
-                )
+                searchHistoryInteractor.addHistory(event.text)
             }
             SearchUiEvent.OnPagination -> fetchNextPage()
             is SearchUiEvent.OnPhotoClick -> searchRoute.navigateToDetail(event.photoId)
@@ -194,20 +192,24 @@ class SearchViewModel @Inject constructor(
 
 
     private fun fetchNextPage() {
-        if (state.value.isLoading && state.value.isPagination) {
+        if (state.isLoading || state.isPagination) {
             return
         }
+
+        cancelFetchDataJob()
         fetchDataJob = combine(
             flickrSearchInteractor.search(
-                query = state.value.query,
+                query = state.query,
                 page = paginationStartPageNumber,
                 perPage = defaultPageSize
             ), bookmarksInteractor.getBookmarks()
         ) { result, bookmarks ->
             paginationStartPageNumber += 1
-            setLoadedStat(state.value.result + result, state.value.query, bookmarks)
-        }.onStart { setState(Pagination(state.value.query, state.value.result)) }
-            .retryWithPolicy { e -> handleAutoRetry(e) }.catch { e -> handleError(e) }
+            setLoadedStat(state.result + result, state.query, bookmarks)
+        }
+            .onStart { setState(Pagination(state.query, state.result)) }
+            .retryOnNetworkConnection(connectivityMonitor)
+            .catch { e -> handleError(e) }
             .launchIn(viewModelScope)
     }
 }
