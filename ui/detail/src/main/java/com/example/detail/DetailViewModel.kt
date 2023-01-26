@@ -97,28 +97,28 @@ class DetailViewModel @Inject constructor(
     }
 }
 
+sealed class DetailUiState(
+    val photoDetail: PhotoDetail? = null,
+    val isBookmarked: Boolean = false,
+    val retryMessage: String? = null,
+) : UIState {
+    val isLoaded: Boolean
+        get() = this is Loaded
+    val isLoading: Boolean
+        get() = this is Loading
+    val isRetry: Boolean
+        get() = this is Retry
+
+    object Loading : DetailUiState()
+    class Retry(retryMessage: String?) : DetailUiState(retryMessage = retryMessage)
+    class Loaded(photoDetail: PhotoDetail, isBookmarked: Boolean) : DetailUiState(
+        photoDetail = photoDetail,
+        isBookmarked = isBookmarked,
+    )
+}
+
 sealed interface DetailUiEvent : UIEvent {
     object Retry : DetailUiEvent
     object NavigationBack : DetailUiEvent
     class OnBookmarkClick(val photoDetail: PhotoDetail?) : DetailUiEvent
-}
-
-sealed class DetailUiState(
-    val photoDetail: PhotoDetail? = null,
-    val isBookmarked: Boolean = false,
-    val isLoading: Boolean = false,
-    val isLoaded: Boolean = false,
-    val isRetry: Boolean = false,
-    val retryMessage: String? = null,
-) : UIState {
-    object Loading : DetailUiState(isLoading = true)
-    class Retry(retryMessage: String?) : DetailUiState(
-        isRetry = true, retryMessage = retryMessage
-    )
-
-    class Loaded(photoDetail: PhotoDetail, isBookmarked: Boolean) : DetailUiState(
-        isLoaded = true,
-        photoDetail = photoDetail,
-        isBookmarked = isBookmarked,
-    )
 }

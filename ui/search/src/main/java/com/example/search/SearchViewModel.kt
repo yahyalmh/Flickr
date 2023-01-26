@@ -165,7 +165,6 @@ class SearchViewModel @Inject constructor(
             .firstOrNull()
             ?.find { it.id == photo.id }
             .let { photoEntity ->
-
                 if (photoEntity == null) {
                     addBookmark(photo)
                 } else {
@@ -214,6 +213,63 @@ class SearchViewModel @Inject constructor(
     }
 }
 
+sealed class SearchUiState(
+    val result: List<Photo> = emptyList(),
+    val bookmarkedPhotos: List<PhotoEntity> = emptyList(),
+    val histories: List<SearchHistoryEntity> = emptyList(),
+    val isKeyboardHidden: Boolean = false,
+    val retryMsg: String? = null,
+    val autoRetryMsg: String? = null,
+    var query: String,
+) : UIState {
+    val isLoaded: Boolean
+        get() = this is DataLoaded
+    val isLoading: Boolean
+        get() = this is Loading
+    val isRetry: Boolean
+        get() = this is Retry
+    val isAutoRetry: Boolean
+        get() = this is AutoRetry
+    val isEmpty: Boolean
+        get() = this is Empty
+    val isStart: Boolean
+        get() = this is Start
+    val isShowingHistory: Boolean
+        get() = this is HistoryLoaded
+    val isPagination: Boolean
+        get() = this is Pagination
+
+    class Loading(query: String, result: List<Photo>) :
+        SearchUiState(query = query, result = result)
+
+    class Empty(query: String = "") : SearchUiState(query = query)
+    object Start : SearchUiState(query = "")
+    class Pagination(query: String, result: List<Photo>) :
+        SearchUiState(query = query, result = result)
+
+    class Retry(retryMsg: String? = null, query: String) : SearchUiState(
+        retryMsg = retryMsg, isKeyboardHidden = true, query = query
+    )
+
+    class AutoRetry(autoRetryMsg: String? = null, query: String) : SearchUiState(
+        isKeyboardHidden = true, autoRetryMsg = autoRetryMsg, query = query
+    )
+
+    class DataLoaded(
+        result: List<Photo>,
+        bookmarkedPhotos: List<PhotoEntity>,
+        query: String,
+    ) : SearchUiState(
+        result = result,
+        bookmarkedPhotos = bookmarkedPhotos,
+        query = query,
+    )
+
+    class HistoryLoaded(histories: List<SearchHistoryEntity>) : SearchUiState(
+        histories = histories, query = ""
+    )
+}
+
 sealed interface SearchUiEvent : UIEvent {
     object Retry : SearchUiEvent
     class QueryChange(val text: String) : SearchUiEvent
@@ -224,53 +280,4 @@ sealed interface SearchUiEvent : UIEvent {
     class OnPhotoClick(val photoId: String) : SearchUiEvent
     class OnHistoryClick(val history: String) : SearchUiEvent
     class OnClearHistoryClick(val history: String) : SearchUiEvent
-}
-
-sealed class SearchUiState(
-    val result: List<Photo> = emptyList(),
-    val bookmarkedPhotos: List<PhotoEntity> = emptyList(),
-    val histories: List<SearchHistoryEntity> = emptyList(),
-    val isLoading: Boolean = false,
-    val isLoaded: Boolean = false,
-    val isKeyboardHidden: Boolean = false,
-    val isRetry: Boolean = false,
-    val isAutoRetry: Boolean = false,
-    val isEmpty: Boolean = false,
-    val isStart: Boolean = false,
-    val retryMsg: String? = null,
-    val autoRetryMsg: String? = null,
-    var query: String,
-    val isShowingHistory: Boolean = false,
-    val isPagination: Boolean = false,
-) : UIState {
-    class Loading(query: String, result: List<Photo>) :
-        SearchUiState(isLoading = true, query = query, result = result)
-
-    class Empty(query: String = "") : SearchUiState(isEmpty = true, query = query)
-    object Start : SearchUiState(isStart = true, query = "")
-    class Pagination(query: String, result: List<Photo>) :
-        SearchUiState(isPagination = true, query = query, result = result)
-
-    class Retry(retryMsg: String? = null, query: String) : SearchUiState(
-        isRetry = true, retryMsg = retryMsg, isKeyboardHidden = true, query = query
-    )
-
-    class AutoRetry(autoRetryMsg: String? = null, query: String) : SearchUiState(
-        isAutoRetry = true, isKeyboardHidden = true, autoRetryMsg = autoRetryMsg, query = query
-    )
-
-    class DataLoaded(
-        result: List<Photo>,
-        bookmarkedPhotos: List<PhotoEntity>,
-        query: String,
-    ) : SearchUiState(
-        isLoaded = true,
-        result = result,
-        bookmarkedPhotos = bookmarkedPhotos,
-        query = query,
-    )
-
-    class HistoryLoaded(histories: List<SearchHistoryEntity>) : SearchUiState(
-        isShowingHistory = true, histories = histories, query = ""
-    )
 }

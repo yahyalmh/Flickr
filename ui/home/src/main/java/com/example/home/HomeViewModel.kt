@@ -69,22 +69,22 @@ open class HomeViewModel @Inject constructor(
 
 sealed class HomeUiState(
     val bookmarkedPhotos: List<PhotoEntity> = emptyList(),
-    val isLoading: Boolean = false,
-    val isRetry: Boolean = false,
     val retryMessage: String? = null,
-    val isLoaded: Boolean = false,
-    val isEmpty: Boolean = false,
 ) : UIState {
-    object Loading : HomeUiState(isLoading = true)
+    val isLoaded: Boolean
+        get() = this is Loaded
+    val isLoading: Boolean
+        get() = this is Loading
+    val isRetry: Boolean
+        get() = this is Retry
+    val isEmpty: Boolean
+        get() = this is Empty
 
-    class Retry(retryMessage: String? = null) :
-        HomeUiState(isRetry = true, retryMessage = retryMessage)
-
+    object Loading : HomeUiState()
+    object Empty : HomeUiState()
+    class Retry(retryMessage: String? = null) : HomeUiState(retryMessage = retryMessage)
     class Loaded(bookmarkedPhotos: List<PhotoEntity>) :
-        HomeUiState(isLoaded = true, bookmarkedPhotos = bookmarkedPhotos)
-
-    object Empty : HomeUiState(isEmpty = true)
-
+        HomeUiState(bookmarkedPhotos = bookmarkedPhotos)
 }
 
 sealed interface HomeUiEvent : UIEvent {
