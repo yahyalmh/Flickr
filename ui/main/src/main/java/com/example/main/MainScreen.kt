@@ -20,7 +20,7 @@ fun MainScreen(
     modifier: Modifier = Modifier,
     viewModel: MainViewModel = hiltViewModel()
 ) {
-    val uiState = viewModel.state.value
+    val uiState = viewModel.state
     AppTheme {
         ContentView(
             modifier = modifier,

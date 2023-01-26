@@ -31,7 +31,7 @@ fun HomeScreen(
 ) {
     HomeScreenContent(
         modifier = modifier,
-        uiState = viewModel.state.value,
+        uiState = viewModel.state,
         onRetry = { viewModel.onEvent(HomeUiEvent.OnRetry) },
         onSearchClicked = { viewModel.onEvent(HomeUiEvent.OnSearchClick) },
         onPhotoClick = { photoId -> viewModel.onEvent(HomeUiEvent.OnPhotoClick(photoId)) },

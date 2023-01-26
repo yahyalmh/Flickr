@@ -40,7 +40,7 @@ fun SearchScreen(
     viewModel: SearchViewModel = hiltViewModel()
 ) {
     SearchViewContent(modifier = modifier,
-        uiState = viewModel.state.value,
+        uiState = viewModel.state,
         onRetry = { viewModel.onEvent(SearchUiEvent.Retry) },
         onQueryChange = { query -> viewModel.onEvent(SearchUiEvent.QueryChange(query)) },
         onSearchClick = { text -> viewModel.onEvent(SearchUiEvent.OnSaveSearch(text)) },

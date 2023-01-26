@@ -37,7 +37,7 @@ fun DetailScreen(
 ) {
     DetailScreenContent(
         modifier = modifier,
-        uiState = viewModel.state.value,
+        uiState = viewModel.state,
         onFavoriteClick = { photoDetail ->
             viewModel.onEvent(
                 DetailUiEvent.OnBookmarkClick(
