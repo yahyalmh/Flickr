@@ -202,8 +202,10 @@ private fun SetupListPagination(
 @OptIn(ExperimentalComposeUiApi::class)
 private fun HandleKeyboard(isKeyboardHidden: Boolean) {
     val keyboardController = LocalSoftwareKeyboardController.current
-    if (isKeyboardHidden) {
-        keyboardController?.hide()
+    LaunchedEffect(key1 = isKeyboardHidden) {
+        if (isKeyboardHidden) {
+            keyboardController?.hide()
+        }
     }
 }
 
