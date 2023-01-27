@@ -84,6 +84,7 @@ private fun ContentView(
     ) {
         Column(
             modifier = modifier
+                .imePadding()
                 .background(MaterialTheme.colorScheme.background)
                 .fillMaxSize(),
             verticalArrangement = Arrangement.Center,

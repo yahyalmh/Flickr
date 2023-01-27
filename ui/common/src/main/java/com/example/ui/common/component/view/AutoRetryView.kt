@@ -38,6 +38,7 @@ fun AutoRetryView(
     ) {
         Column(
             modifier = modifier
+                .imePadding()
                 .background(MaterialTheme.colorScheme.background)
                 .padding(10.dp)
                 .fillMaxSize(),
