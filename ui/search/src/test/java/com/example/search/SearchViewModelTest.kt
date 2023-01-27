@@ -169,7 +169,7 @@ internal class SearchViewModelTest {
         Assertions.assertTrue(searchViewModel.state is AutoRetry)
 
         advanceUntilIdle()
-        Assertions.assertTrue(searchViewModel.state is DataLoaded)
+        Assertions.assertTrue(searchViewModel.state is Loaded)
     }
 
     @Test
@@ -212,7 +212,7 @@ internal class SearchViewModelTest {
         searchViewModel.onEvent(SearchUiEvent.Retry)
 
         advanceUntilIdle()
-        Assertions.assertTrue(searchViewModel.state is DataLoaded)
+        Assertions.assertTrue(searchViewModel.state is Loaded)
     }
 
     @Test
@@ -234,7 +234,7 @@ internal class SearchViewModelTest {
             initializeViewmodel()
             searchViewModel.searchFlow.emit(sampleQuery)
             advanceUntilIdle()
-            Assertions.assertTrue(searchViewModel.state is DataLoaded)
+            Assertions.assertTrue(searchViewModel.state is Loaded)
 
             searchViewModel.onEvent(OnBookmark(photosStub.last()))
             advanceUntilIdle()

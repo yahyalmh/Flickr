@@ -76,6 +76,7 @@ private fun SearchViewContent(
         hint = stringResource(id = R.string.searchBarHint),
         savedQuery = uiState.query,
         histories = uiState.histories.map { it.text },
+        isHistoryVisible = uiState.isHistoryVisible,
         onQueryChange = onQueryChange,
         onCancelClick = onCancelClick,
         onSearchClick = onSearchClick,
@@ -89,14 +90,14 @@ private fun SearchViewContent(
 
         AutoRetryView(
             isVisible = uiState.isAutoRetry,
-            errorMessage = uiState.autoRetryMsg,
+            errorMessage = uiState.autoRetryMessage,
             icon = AppIcons.Warning,
             hint = stringResource(id = R.string.searchAutoRetryHint)
         )
 
         RetryView(
             isVisible = uiState.isRetry,
-            retryMessage = uiState.retryMsg,
+            retryMessage = uiState.retryMessage,
             icon = AppIcons.Warning,
             onRetry = onRetry
         )
@@ -258,7 +259,7 @@ private fun buildNoResultHint(query: String) = buildAnnotatedString {
 @Composable
 fun SearchPreview() {
     SearchViewContent(
-        uiState = SearchUiState.Loading("", emptyList()),
+        uiState = SearchUiState.Start,
         onRetry = {},
         onCancelClick = {},
         onQueryChange = {},

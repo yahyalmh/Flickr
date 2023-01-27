@@ -3,10 +3,7 @@ package com.example.home
 import androidx.lifecycle.viewModelScope
 import com.example.bookmark.BookmarksInteractor
 import com.example.data.common.database.bookmark.PhotoEntity
-import com.example.home.HomeUiState.Empty
-import com.example.home.HomeUiState.Loaded
-import com.example.home.HomeUiState.Loading
-import com.example.home.HomeUiState.Retry
+import com.example.home.HomeUiState.*
 import com.example.home.nav.HomeRoute
 import com.example.ui.common.BaseViewModel
 import com.example.ui.common.UIEvent
@@ -36,15 +33,15 @@ open class HomeViewModel @Inject constructor(
             .onStart { setState(Loading) }
             .onEach { photos ->
                 when {
-                    photos.isEmpty() -> setState(Empty)
-                    else -> setState(Loaded(bookmarkedPhotos = photos))
+                    photos.isEmpty() -> setState(Empty(state))
+                    else -> setState(Loaded(state.copy(bookmarkedPhotos = photos)))
                 }
             }
             .catch { e -> handleRetry(e) }
             .launchIn(viewModelScope)
     }
 
-    private fun handleRetry(e: Throwable) = setState(Retry(retryMessage = e.message))
+    private fun handleRetry(e: Throwable) = setState(Retry(state.copy(retryMessage = e.message)))
 
     override fun onEvent(event: HomeUiEvent) {
         when (event) {
@@ -67,7 +64,7 @@ open class HomeViewModel @Inject constructor(
     }
 }
 
-sealed class HomeUiState(
+open class HomeUiState(
     val bookmarkedPhotos: List<PhotoEntity> = emptyList(),
     val retryMessage: String? = null,
 ) : UIState {
@@ -80,11 +77,23 @@ sealed class HomeUiState(
     val isEmpty: Boolean
         get() = this is Empty
 
+    constructor(state: HomeUiState) : this(
+        state.bookmarkedPhotos,
+        state.retryMessage,
+    )
+
+    fun copy(
+        bookmarkedPhotos: List<PhotoEntity> = this.bookmarkedPhotos,
+        retryMessage: String? = this.retryMessage,
+    ) = HomeUiState(
+        bookmarkedPhotos,
+        retryMessage,
+    )
+
     object Loading : HomeUiState()
-    object Empty : HomeUiState()
-    class Retry(retryMessage: String? = null) : HomeUiState(retryMessage = retryMessage)
-    class Loaded(bookmarkedPhotos: List<PhotoEntity>) :
-        HomeUiState(bookmarkedPhotos = bookmarkedPhotos)
+    class Retry(state: HomeUiState) : HomeUiState(state)
+    class Empty(state: HomeUiState) : HomeUiState(state)
+    class Loaded(state: HomeUiState) : HomeUiState(state)
 }
 
 sealed interface HomeUiEvent : UIEvent {

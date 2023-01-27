@@ -9,6 +9,7 @@ import com.example.data.common.model.toEntity
 import com.example.detail.DetailUiState.Loaded
 import com.example.detail.DetailUiState.Loading
 import com.example.detail.DetailUiState.Retry
+import com.example.detail.DetailUiState.Start
 import com.example.detail.nav.DetailRoute
 import com.example.filckrsearch.detail.FlickrDetailInteractor
 import com.example.ui.common.BaseViewModel
@@ -32,7 +33,7 @@ class DetailViewModel @Inject constructor(
     private val imageDownloader: ImageDownloader,
     private val bookmarksInteractor: BookmarksInteractor,
     private val flickrDetailInteractor: FlickrDetailInteractor,
-) : BaseViewModel<DetailUiState, DetailUiEvent>(Loading) {
+) : BaseViewModel<DetailUiState, DetailUiEvent>(Start) {
     private val detailArgs: DetailRoute.DetailArgs = DetailRoute.DetailArgs(savedStateHandle)
 
     init {
@@ -45,8 +46,11 @@ class DetailViewModel @Inject constructor(
             bookmarksInteractor.getBookmarks()
         ) { photoDetail, bookmarks ->
             setState(
-                Loaded(photoDetail = photoDetail,
-                    isBookmarked = bookmarks.any { it.id == photoDetail.id })
+                Loaded(
+                    state.copy(
+                        photoDetail = photoDetail,
+                        isBookmarked = bookmarks.any { it.id == photoDetail.id })
+                )
             )
         }
             .onStart { setState(Loading) }
@@ -54,7 +58,7 @@ class DetailViewModel @Inject constructor(
             .launchIn(viewModelScope)
     }
 
-    private fun handleError(e: Throwable) = setState(Retry(retryMessage = e.message))
+    private fun handleError(e: Throwable) = setState(Retry(state.copy(retryMessage = e.message)))
 
     override fun onEvent(event: DetailUiEvent) {
         when (event) {
@@ -97,7 +101,7 @@ class DetailViewModel @Inject constructor(
     }
 }
 
-sealed class DetailUiState(
+open class DetailUiState(
     val photoDetail: PhotoDetail? = null,
     val isBookmarked: Boolean = false,
     val retryMessage: String? = null,
@@ -109,12 +113,27 @@ sealed class DetailUiState(
     val isRetry: Boolean
         get() = this is Retry
 
-    object Loading : DetailUiState()
-    class Retry(retryMessage: String?) : DetailUiState(retryMessage = retryMessage)
-    class Loaded(photoDetail: PhotoDetail, isBookmarked: Boolean) : DetailUiState(
-        photoDetail = photoDetail,
-        isBookmarked = isBookmarked,
+
+    constructor(state: DetailUiState) : this(
+        state.photoDetail,
+        state.isBookmarked,
+        state.retryMessage,
     )
+
+    fun copy(
+        photoDetail: PhotoDetail? = this.photoDetail,
+        isBookmarked: Boolean = this.isBookmarked,
+        retryMessage: String? = this.retryMessage,
+    ) = DetailUiState(
+        photoDetail,
+        isBookmarked,
+        retryMessage,
+    )
+
+    object Start : DetailUiState()
+    object Loading : DetailUiState()
+    class Retry(state: DetailUiState) : DetailUiState(state)
+    class Loaded(state: DetailUiState) : DetailUiState(state)
 }
 
 sealed interface DetailUiEvent : UIEvent {
