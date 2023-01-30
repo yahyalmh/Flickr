@@ -39,8 +39,8 @@ private fun ContentView(
     Column {
         ConnectivityStatusView(
             modifier = modifier,
-            isOnlineViewVisible = uiState.isOnlineViewVisible,
-            isOfflineViewVisible = uiState.isOfflineViewVisible
+            isVisible = uiState.isConnectivityStatusVisible,
+            isOnline = uiState.isOnline
         )
         Scaffold(
             modifier = modifier.fillMaxSize(),
@@ -74,7 +74,12 @@ private fun SetupAppNavHost(
 fun OfflineContentPreview() {
     val navController = rememberNavController()
     ContentView(
-        uiState = MainUiState.Offline,
+        uiState = MainUiState.ConnectivityStatus(
+            MainUiState(
+                isConnectivityStatusVisible = true,
+                isOnline = false
+            )
+        ),
         navController = navController,
     )
 }
@@ -89,7 +94,12 @@ fun OfflineContentPreview() {
 fun OnlineContentPreview() {
     val navController = rememberNavController()
     ContentView(
-        uiState = MainUiState.Online,
+        uiState = MainUiState.ConnectivityStatus(
+            MainUiState(
+                isConnectivityStatusVisible = true,
+                isOnline = true
+            )
+        ),
         navController = navController,
     )
 }
