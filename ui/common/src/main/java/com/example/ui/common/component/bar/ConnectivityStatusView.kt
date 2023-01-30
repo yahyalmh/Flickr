@@ -1,7 +1,14 @@
 package com.example.ui.common.component.bar
 
-import androidx.compose.animation.*
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
@@ -10,94 +17,84 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material.Text
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import com.example.ui.common.test.TestTag
 import com.example.flickr.ui.common.R
+import com.example.ui.common.test.TestTag
+import kotlinx.coroutines.delay
 
+/**
+ * @author yaya (@yahyalmh)
+ * @since 02th November 2022
+ */
 
+@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun ConnectivityStatusView(
     modifier: Modifier = Modifier,
-    isOnlineViewVisible: Boolean,
-    isOfflineViewVisible: Boolean,
+    isVisible: Boolean,
+    isOnline: Boolean,
 ) {
-    OfflineView(modifier = modifier, isVisible = isOfflineViewVisible)
-    OnlineView(modifier = modifier, isVisible = isOnlineViewVisible)
-}
+    val hideOnlineViewDelay = 1500L
+    val animationDuration = 500
+    val backgroundColor by animateColorAsState(if (isOnline) Color.Green else Color.Red)
+    val textId = remember(isOnline) { if (isOnline) R.string.online else R.string.waitForNetwork }
+    val testTag = if (isOnline) TestTag.ONLINE_STATUS_VIEW else TestTag.OFFLINE_STATUS_VIEW
 
-@Composable
-internal fun OfflineView(
-    modifier: Modifier = Modifier,
-    isVisible: Boolean
-) {
+    var isRemainVisible by remember(isVisible, isOnline) { mutableStateOf(true) }
+    LaunchedEffect(isOnline) {
+        if (isOnline) {
+            delay(hideOnlineViewDelay)
+            isRemainVisible = false
+        }
+    }
+
     AnimatedVisibility(
         modifier = modifier
             .fillMaxWidth()
             .wrapContentHeight()
-            .background(Color.Red)
-            .testTag(TestTag.ONLINE_STATUS_VIEW),
-        visible = isVisible,
-        enter = fadeIn(animationSpec = tween(500)) +
-                expandVertically(animationSpec = tween(500)),
-        exit = fadeOut(animationSpec = tween(500)) +
-                shrinkVertically(animationSpec = tween(500))
+            .background(backgroundColor)
+            .testTag(testTag),
+        visible = isVisible && isRemainVisible,
+        enter = fadeIn(animationSpec = tween(animationDuration)) +
+                expandVertically(animationSpec = tween(animationDuration)),
+        exit = fadeOut(animationSpec = tween(animationDuration)) +
+                shrinkVertically(animationSpec = tween(animationDuration))
     ) {
-        Row(
-            modifier = modifier,
-            verticalAlignment = Alignment.Top,
-            horizontalArrangement = Arrangement.Center
-        ) {
-            Text(
-                text = stringResource(R.string.waitForNetwork),
-                style = MaterialTheme.typography.bodySmall
-            )
+        AnimatedContent(targetState = textId) {
+            Row(
+                modifier = modifier,
+                verticalAlignment = Alignment.Top,
+                horizontalArrangement = Arrangement.Center
+            ) {
+                Text(
+                    modifier = modifier,
+                    text = stringResource(it),
+                    style = MaterialTheme.typography.bodySmall
+                )
+            }
         }
-    }
-}
 
-@Composable
-internal fun OnlineView(
-    modifier: Modifier = Modifier,
-    isVisible: Boolean
-) {
-    AnimatedVisibility(
-        modifier = modifier
-            .fillMaxWidth()
-            .wrapContentHeight()
-            .background(Color.Green)
-            .testTag(TestTag.OFFLINE_STATUS_VIEW),
-        visible = isVisible,
-        enter = fadeIn(animationSpec = tween(500)) +
-                expandVertically(animationSpec = tween(500)),
-        exit = fadeOut(animationSpec = tween(500)) +
-                shrinkVertically(animationSpec = tween(500))
-    ) {
-        Row(
-            modifier = modifier,
-            verticalAlignment = Alignment.Top,
-            horizontalArrangement = Arrangement.Center
-        ) {
-            Text(
-                text = stringResource(id = R.string.online),
-                style = MaterialTheme.typography.bodySmall,
-            )
-        }
     }
-}
-
-@Preview
-@Composable
-fun OfflinePreview() {
-    ConnectivityStatusView(isOnlineViewVisible = false, isOfflineViewVisible = true)
 }
 
 @Preview
 @Composable
 fun OnlinePreview() {
-    ConnectivityStatusView(isOnlineViewVisible = true, isOfflineViewVisible = false)
+    ConnectivityStatusView(isOnline = true, isVisible = true)
+}
+
+@Preview
+@Composable
+fun OfflinePreview() {
+    ConnectivityStatusView(isOnline = false, isVisible = true)
 }
