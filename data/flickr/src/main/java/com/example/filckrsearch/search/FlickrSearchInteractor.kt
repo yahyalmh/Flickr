@@ -22,6 +22,11 @@ class FlickrSearchInteractorImpl @Inject constructor(
             page = page,
             perPage = perPage
         )
+        val result2 = flickrSearchRepository.search2(
+            query = query,
+            page = page,
+            perPage = perPage
+        )
         emit(result.photoItems.map { it.toExternalModel() })
     }.flowOn(Dispatchers.IO)
 }

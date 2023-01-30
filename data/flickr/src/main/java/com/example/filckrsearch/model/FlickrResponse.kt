@@ -1,14 +1,22 @@
 package com.example.filckrsearch.model
 
+import com.google.gson.annotations.SerializedName
 
-sealed class FlickrResponse {
+
+open class FlickrResponse {
+    @SerializedName("stat")
+    open val status: String = ""
+
     data class SearchResponse(
-        val stat: String,
-        val photos: PhotosModel
+        val photos: PhotosModel,
     ) : FlickrResponse()
 
     data class DetailResponse(
-        val stat: String,
         val photo: PhotoDetailModel
     ) : FlickrResponse()
+
+    data class ErrorResponse(
+        val code: Int,
+        val message: String,
+    ):FlickrResponse()
 }
