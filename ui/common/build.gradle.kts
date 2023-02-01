@@ -5,6 +5,8 @@ plugins {
     id("de.mannodermaus.android-junit5")
     id("com.google.dagger.hilt.android")
 }
+
+@Suppress("UnstableApiUsage")
 android {
     namespace = "com.example.flickr.ui.common"
     compileSdk = AppConfig.compileSdk
@@ -54,5 +56,5 @@ dependencies {
     composeTest()
     androidXTest()
     composeMaterial()
-    moduleDependency(":data:common")
+    moduleDependency(projects.data.common)
 }

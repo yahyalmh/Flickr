@@ -5,6 +5,8 @@ plugins {
     id("com.google.dagger.hilt.android")
     id("de.mannodermaus.android-junit5")
 }
+
+@Suppress("UnstableApiUsage")
 android {
     namespace = "com.example.flickr.ui.search"
     compileSdk = AppConfig.compileSdk
@@ -58,10 +60,10 @@ dependencies {
     composeTest()
     hiltTest()
 
-    moduleDependency(":data:common")
-    moduleDependency(":data:flickr")
-    moduleDependency(":data:bookmark")
-    moduleDependency(":data:searchhistory")
-    moduleDependency(":ui:common")
-    moduleDependency(":ui:detail")
+    moduleDependency(projects.data.common)
+    moduleDependency(projects.data.flickr)
+    moduleDependency(projects.data.bookmark)
+    moduleDependency(projects.data.searchhistory)
+    moduleDependency(projects.ui.common)
+    moduleDependency(projects.ui.detail)
 }

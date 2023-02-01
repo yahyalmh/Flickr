@@ -195,8 +195,8 @@ fun DependencyHandler.mockito() {
     testImplementation(Dependencies.MOCKITO_KOTLIN)
 }
 
-fun DependencyHandler.moduleDependency(path: String) {
-    implementation(project(path))
+fun DependencyHandler.moduleDependency(dependency: Dependency) {
+    implementation(dependency)
 }
 
 fun DependencyHandler.espresso() = androidTestImplementation(Dependencies.ANDROIDX_ESPRESSO_CORE)

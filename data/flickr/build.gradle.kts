@@ -6,6 +6,7 @@ plugins {
     id("de.mannodermaus.android-junit5")
 }
 
+@Suppress("UnstableApiUsage")
 android {
     namespace = "com.example.flickr.data.flickr"
     compileSdk = AppConfig.compileSdk
@@ -43,6 +44,6 @@ dependencies {
     androidXTest()
     espresso()
     mockito()
-    moduleDependency(":data:common")
+    moduleDependency(projects.data.common)
 }
 

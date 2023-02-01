@@ -5,6 +5,7 @@ plugins {
     id("com.google.dagger.hilt.android")
 }
 
+@Suppress("UnstableApiUsage")
 android {
     namespace = "com.example.flickr.ui.detail"
     compileSdk = AppConfig.compileSdk
@@ -52,8 +53,8 @@ dependencies {
     hilt()
     junit4()
 
-    moduleDependency(":data:flickr")
-    moduleDependency(":data:bookmark")
-    moduleDependency(":data:common")
-    moduleDependency(":ui:common")
+    moduleDependency(projects.data.flickr)
+    moduleDependency(projects.data.bookmark)
+    moduleDependency(projects.data.common)
+    moduleDependency(projects.ui.common)
 }

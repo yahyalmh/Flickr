@@ -4,7 +4,7 @@ plugins {
     kotlin("kapt")
     id("com.google.dagger.hilt.android")
 }
-
+@Suppress("UnstableApiUsage")
 android {
     namespace = "com.example.flickr"
     compileSdk = AppConfig.compileSdk
@@ -61,5 +61,5 @@ dependencies {
     coroutines()
     hilt()
     junit4()
-    moduleDependency(":ui:main")
+    moduleDependency(projects.ui.main)
 }

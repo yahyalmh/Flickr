@@ -5,6 +5,7 @@ plugins {
     id("com.google.dagger.hilt.android")
 }
 
+@Suppress("UnstableApiUsage")
 android {
     namespace = "com.example.flickr.data.common"
     compileSdk = AppConfig.compileSdk

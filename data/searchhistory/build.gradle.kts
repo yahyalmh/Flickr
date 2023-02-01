@@ -5,6 +5,7 @@ plugins {
     id("com.google.dagger.hilt.android")
 }
 
+@Suppress("UnstableApiUsage")
 android {
     namespace = "com.example.flickr.data.history"
     compileSdk = AppConfig.compileSdk
@@ -39,5 +40,5 @@ dependencies {
     coroutines()
     hilt()
     junit4()
-    moduleDependency(":data:common")
+    moduleDependency(projects.data.common)
 }

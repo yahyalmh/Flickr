@@ -6,6 +6,7 @@ plugins {
     id("de.mannodermaus.android-junit5")
 }
 
+@Suppress("UnstableApiUsage")
 android {
     namespace = "com.example.flickr.ui.home"
     compileSdk = AppConfig.compileSdk
@@ -61,9 +62,9 @@ dependencies {
     composeTest()
     hiltTest()
 
-    moduleDependency(":ui:common")
-    moduleDependency(":ui:search")
-    moduleDependency(":ui:detail")
-    moduleDependency(":data:common")
-    moduleDependency(":data:bookmark")
+    moduleDependency(projects.ui.common)
+    moduleDependency(projects.ui.search)
+    moduleDependency(projects.ui.detail)
+    moduleDependency(projects.data.common)
+    moduleDependency(projects.data.bookmark)
 }

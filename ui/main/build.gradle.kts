@@ -5,6 +5,7 @@ plugins {
     id("com.google.dagger.hilt.android")
 }
 
+@Suppress("UnstableApiUsage")
 android {
     namespace = "com.example.flickr.ui.main"
     compileSdk = AppConfig.compileSdk
@@ -53,8 +54,8 @@ dependencies {
     hilt()
     hiltTest()
 
-    moduleDependency(":ui:common")
-    moduleDependency(":ui:home")
-    moduleDependency(":ui:search")
-    moduleDependency(":ui:detail")
+    moduleDependency(projects.ui.common)
+    moduleDependency(projects.ui.home)
+    moduleDependency(projects.ui.search)
+    moduleDependency(projects.ui.detail)
 }
