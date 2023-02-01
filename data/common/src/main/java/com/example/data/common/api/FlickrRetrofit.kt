@@ -1,6 +1,5 @@
 package com.example.data.common.api
 
-import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import javax.inject.Inject
@@ -16,15 +15,7 @@ class FlickrRetrofit @Inject constructor(
 
     override val retrofit: Retrofit
         get() {
-            val okHttpClient = okHttpClientBuilder.addInterceptor(Interceptor { chain ->
-                val request = chain
-                    .request()
-                    .newBuilder()
-                    .addHeader("Content-Type", "application/json")
-                    .build()
-                chain.proceed(request = request)
-            }).build()
-
+            val okHttpClient = okHttpClientBuilder.build()
             return retrofitBuilder
                 .client(okHttpClient)
                 .baseUrl(FLICKR_BASE_URL)
