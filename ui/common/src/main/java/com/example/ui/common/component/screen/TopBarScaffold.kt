@@ -11,6 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import com.example.ui.common.component.bar.TopAppBar
@@ -55,4 +56,12 @@ fun TopBarScaffold(
         },
         content = content
     )
+}
+
+@Composable
+@Preview
+fun TopBarPreview(){
+    TopBarScaffold(title = "Title") {
+
+    }
 }
