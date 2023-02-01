@@ -1,9 +1,9 @@
 plugins {
-    id("com.android.library")
-    id("org.jetbrains.kotlin.android")
-    kotlin("kapt")
-    id("de.mannodermaus.android-junit5")
-    id("com.google.dagger.hilt.android")
+    androidLibrary()
+    kotlinAndroid()
+    kapt()
+    hilt()
+    junit5Plugin()
 }
 
 @Suppress("UnstableApiUsage")

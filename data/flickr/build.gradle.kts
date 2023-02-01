@@ -1,11 +1,10 @@
 plugins {
-    id("com.android.library")
-    id("org.jetbrains.kotlin.android")
-    kotlin("kapt")
-    id("com.google.dagger.hilt.android")
-    id("de.mannodermaus.android-junit5")
+    androidLibrary()
+    kotlinAndroid()
+    kapt()
+    hilt()
+    junit5Plugin()
 }
-
 @Suppress("UnstableApiUsage")
 android {
     namespace = "com.example.flickr.data.flickr"

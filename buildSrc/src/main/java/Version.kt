@@ -1,4 +1,3 @@
-
 object Version {
     const val COROUTINES = "1.6.4"
     const val ROOM_VERSION = "2.4.3"
@@ -41,4 +40,20 @@ object Version {
         const val JUNIT5 = "5.9.1"
         const val JUNIT = "4.13.2"
     }
+
+    object Plugin {
+        const val JUNIT5_GRADLE_PLUGIN = "1.8.2.1"
+        const val GRADLE_VERSIONS = "0.45.0"
+
+        object Kotlin {
+            const val ANDROID = "1.7.21"
+            const val JVM = "1.7.21"
+        }
+
+        object Android {
+            const val APPLICATION = "7.4.0"
+            const val LIBRARY = "7.4.0"
+        }
+    }
+
 }
