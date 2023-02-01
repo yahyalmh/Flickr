@@ -26,10 +26,10 @@ fun TopBarScaffold(
     actionIconContentDescription: String? = null,
     actionIconColor: Color = MaterialTheme.colorScheme.onSurface,
     onActionClick: () -> Unit = {},
-    onBackHandler: () -> Unit = {},
+    onBackHandler: (() -> Unit)? = null,
     content: @Composable (PaddingValues) -> Unit
 ) {
-    BackHandler { onBackHandler() }
+    onBackHandler?.let { BackHandler { it() } }
     Scaffold(
         containerColor = MaterialTheme.colorScheme.surface,
         topBar = {
