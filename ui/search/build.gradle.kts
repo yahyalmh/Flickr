@@ -63,7 +63,7 @@ dependencies {
     moduleDependency(projects.data.common)
     moduleDependency(projects.data.search)
     moduleDependency(projects.data.bookmark)
-    moduleDependency(projects.data.searchhistory)
+    moduleDependency(projects.data.history)
     moduleDependency(projects.ui.common)
     moduleDependency(projects.ui.detail)
 }

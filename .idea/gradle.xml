@@ -16,8 +16,8 @@
             <option value="$PROJECT_DIR$/data/bookmark" />
             <option value="$PROJECT_DIR$/data/common" />
             <option value="$PROJECT_DIR$/data/detail" />
+            <option value="$PROJECT_DIR$/data/history" />
             <option value="$PROJECT_DIR$/data/search" />
-            <option value="$PROJECT_DIR$/data/searchhistory" />
             <option value="$PROJECT_DIR$/ui" />
             <option value="$PROJECT_DIR$/ui/common" />
             <option value="$PROJECT_DIR$/ui/detail" />
