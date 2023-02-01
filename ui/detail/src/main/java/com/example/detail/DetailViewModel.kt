@@ -10,8 +10,8 @@ import com.example.detail.DetailUiState.Loaded
 import com.example.detail.DetailUiState.Loading
 import com.example.detail.DetailUiState.Retry
 import com.example.detail.DetailUiState.Start
+import com.example.detail.detail.FlickrDetailInteractor
 import com.example.detail.nav.DetailRoute
-import com.example.filckrsearch.detail.FlickrDetailInteractor
 import com.example.ui.common.BaseViewModel
 import com.example.ui.common.UIEvent
 import com.example.ui.common.UIState

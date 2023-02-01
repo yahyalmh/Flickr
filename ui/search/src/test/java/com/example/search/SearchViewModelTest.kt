@@ -5,12 +5,12 @@ import com.example.data.common.database.bookmark.PhotoEntity
 import com.example.data.common.database.history.SearchHistoryEntity
 import com.example.data.common.model.Photo
 import com.example.data.common.model.toEntity
-import com.example.filckrsearch.search.FlickrSearchInteractorImpl
 import com.example.history.SearchHistoryInteractorImpl
 import com.example.search.SearchUiEvent.*
 import com.example.search.SearchUiState.*
 import com.example.search.SearchUiState.Retry
 import com.example.search.nav.SearchRoute
+import com.example.search.search.FlickrSearchInteractorImpl
 import com.example.ui.common.connectivity.ConnectivityMonitor
 import com.example.ui.common.test.MainDispatcherRule
 import com.example.ui.common.test.thenEmitError

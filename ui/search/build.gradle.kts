@@ -61,7 +61,7 @@ dependencies {
     hiltTest()
 
     moduleDependency(projects.data.common)
-    moduleDependency(projects.data.flickr)
+    moduleDependency(projects.data.search)
     moduleDependency(projects.data.bookmark)
     moduleDependency(projects.data.searchhistory)
     moduleDependency(projects.ui.common)

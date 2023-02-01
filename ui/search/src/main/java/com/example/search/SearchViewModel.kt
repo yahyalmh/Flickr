@@ -7,7 +7,6 @@ import com.example.data.common.database.bookmark.PhotoEntity
 import com.example.data.common.database.history.SearchHistoryEntity
 import com.example.data.common.model.Photo
 import com.example.data.common.model.toEntity
-import com.example.filckrsearch.search.FlickrSearchInteractor
 import com.example.history.SearchHistoryInteractor
 import com.example.search.SearchUiState.AutoRetry
 import com.example.search.SearchUiState.Loaded
@@ -18,6 +17,7 @@ import com.example.search.SearchUiState.Pagination
 import com.example.search.SearchUiState.Retry
 import com.example.search.SearchUiState.Start
 import com.example.search.nav.SearchRoute
+import com.example.search.search.FlickrSearchInteractor
 import com.example.ui.common.BaseViewModel
 import com.example.ui.common.UIEvent
 import com.example.ui.common.UIState

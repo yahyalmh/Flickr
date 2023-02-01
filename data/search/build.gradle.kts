@@ -3,11 +3,11 @@ plugins {
     kotlinAndroid()
     kapt()
     hilt()
+    junit5Plugin()
 }
-
 @Suppress("UnstableApiUsage")
 android {
-    namespace = "com.example.flickr.ui.detail"
+    namespace = "com.example.flickr.data.search"
     compileSdk = AppConfig.compileSdk
 
     defaultConfig {
@@ -33,28 +33,15 @@ android {
     kotlinOptions {
         jvmTarget = "1.8"
     }
-    buildFeatures {
-        compose = true
-    }
-    composeOptions {
-        kotlinCompilerExtensionVersion = Version.KOTLIN_COMPILER_EXTENSION_VERSION
-    }
 }
 
 dependencies {
-    androidxCore()
-    compose()
-    composeNavigation()
-    composeViewModel()
-    composeMaterial()
-    coilCompose()
-    placeholder()
-
+    retrofit()
+    coroutines()
     hilt()
-    junit4()
-
-    moduleDependency(projects.data.detail)
-    moduleDependency(projects.data.bookmark)
+    junit5()
+    androidXTest()
+    espresso()
+    mockito()
     moduleDependency(projects.data.common)
-    moduleDependency(projects.ui.common)
 }

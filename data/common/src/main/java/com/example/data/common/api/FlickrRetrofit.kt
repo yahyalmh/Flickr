@@ -11,6 +11,7 @@ class FlickrRetrofit @Inject constructor(
 
     companion object {
         private const val FLICKR_BASE_URL = "https://api.flickr.com/services/"
+        const val API_KEY = "1508443e49213ff84d566777dc211f2a"
     }
 
     override val retrofit: Retrofit
