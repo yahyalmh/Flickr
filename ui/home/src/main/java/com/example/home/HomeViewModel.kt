@@ -12,7 +12,6 @@ import com.example.home.nav.HomeRoute
 import com.example.ui.common.BaseViewModel
 import com.example.ui.common.UIEvent
 import com.example.ui.common.UIState
-import com.example.ui.common.ext.addTo
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.firstOrNull
@@ -29,7 +28,7 @@ open class HomeViewModel @Inject constructor(
     private val homeRoute: HomeRoute,
 ) : BaseViewModel<HomeUiState, HomeUiEvent>(Loading) {
 
-    override fun onStart(owner: LifecycleOwner) {
+    override fun onCreate(owner: LifecycleOwner) {
         fetchBookmarked()
     }
 
@@ -44,7 +43,6 @@ open class HomeViewModel @Inject constructor(
             }
             .catch { e -> handleRetry(e) }
             .launchIn(viewModelScope)
-            .addTo(jobDisposable)
     }
 
     private fun handleRetry(e: Throwable) = setState(Retry(state.copy(retryMessage = e.message)))

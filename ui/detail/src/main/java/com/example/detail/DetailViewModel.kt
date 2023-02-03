@@ -16,7 +16,6 @@ import com.example.detail.nav.DetailRoute
 import com.example.ui.common.BaseViewModel
 import com.example.ui.common.UIEvent
 import com.example.ui.common.UIState
-import com.example.ui.common.ext.addTo
 import com.example.ui.common.utility.ImageDownloader
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.catch
@@ -38,7 +37,7 @@ class DetailViewModel @Inject constructor(
 ) : BaseViewModel<DetailUiState, DetailUiEvent>(Start) {
     private val detailArgs: DetailRoute.DetailArgs = DetailRoute.DetailArgs(savedStateHandle)
 
-    override fun onStart(owner: LifecycleOwner) {
+    override fun onCreate(owner: LifecycleOwner) {
         fetchPhotoDetail()
     }
 
@@ -58,7 +57,6 @@ class DetailViewModel @Inject constructor(
             .onStart { setState(Loading) }
             .catch { e -> handleError(e) }
             .launchIn(viewModelScope)
-            .addTo(jobDisposable)
     }
 
     private fun handleError(e: Throwable) = setState(Retry(state.copy(retryMessage = e.message)))
