@@ -1,5 +1,6 @@
 package com.example.search
 
+import androidx.lifecycle.testing.TestLifecycleOwner
 import com.example.bookmark.BookmarksInteractorImpl
 import com.example.data.common.database.bookmark.PhotoEntity
 import com.example.data.common.database.history.SearchHistoryEntity
@@ -48,6 +49,8 @@ internal class SearchViewModelTest {
     @get:Rule
     val dispatcherRule = MainDispatcherRule()
 
+    private val testLifecycleOwner by lazy { TestLifecycleOwner() }
+
     @Mock
     private lateinit var flickrSearchInteractor: FlickrSearchInteractorImpl
 
@@ -79,9 +82,6 @@ internal class SearchViewModelTest {
         photosStub = photosStub()
         bookmarkedPhotos = photoEntitiesStub().toMutableList()
         searchHistories = searchHistoriesEntityStub()
-    }
-
-    private fun initializeViewmodel() {
         searchViewModel = SearchViewModel(
             flickrSearchInteractor = flickrSearchInteractor,
             bookmarksInteractor = bookmarksInteractor,
@@ -97,7 +97,7 @@ internal class SearchViewModelTest {
         runTest {
             whenever(searchHistoryInteractor.getHistories()).thenReturn(flowOf(searchHistories))
 
-            initializeViewmodel()
+            searchViewModel.onCreate(testLifecycleOwner)
             Assertions.assertTrue(searchViewModel.state is HistoryLoaded)
         }
 
@@ -106,7 +106,7 @@ internal class SearchViewModelTest {
         runTest {
             whenever(searchHistoryInteractor.getHistories()).thenReturn(flowOf(emptyList()))
 
-            initializeViewmodel()
+            searchViewModel.onCreate(testLifecycleOwner)
             Assertions.assertTrue(searchViewModel.state is Start)
         }
 
@@ -116,7 +116,7 @@ internal class SearchViewModelTest {
         whenever(searchHistoryInteractor.getHistories()).thenReturn(flowOf(searchHistories))
         whenever(bookmarksInteractor.getBookmarks()).thenReturn(flowOf(bookmarkedPhotos))
 
-        initializeViewmodel()
+        searchViewModel.onCreate(testLifecycleOwner)
         searchViewModel.searchFlow.emit(sampleQuery)
         advanceUntilIdle()
 
@@ -138,7 +138,7 @@ internal class SearchViewModelTest {
             emit(true)
         })
 
-        initializeViewmodel()
+        searchViewModel.onCreate(testLifecycleOwner)
         searchViewModel.searchFlow.emit(sampleQuery)
         advanceTimeBy(1000)
         Assertions.assertTrue(searchViewModel.state is AutoRetry)
@@ -163,7 +163,7 @@ internal class SearchViewModelTest {
                 }
             })
 
-        initializeViewmodel()
+        searchViewModel.onCreate(testLifecycleOwner)
         searchViewModel.searchFlow.emit(sampleQuery)
         advanceTimeBy(1000)
         Assertions.assertTrue(searchViewModel.state is AutoRetry)
@@ -186,7 +186,7 @@ internal class SearchViewModelTest {
                 throw IOException()
             })
 
-        initializeViewmodel()
+        searchViewModel.onCreate(testLifecycleOwner)
         searchViewModel.searchFlow.emit(sampleQuery)
         advanceTimeBy(1000)
         Assertions.assertTrue(searchViewModel.state is AutoRetry)
@@ -200,7 +200,7 @@ internal class SearchViewModelTest {
     fun `GIVEN retry event THEN data load successfully`() = runTest {
         whenever(flickrSearchInteractor.search(any(), any(), any())).thenEmitError(IOException())
 
-        initializeViewmodel()
+        searchViewModel.onCreate(testLifecycleOwner)
         searchViewModel.searchFlow.emit(sampleQuery)
         advanceUntilIdle()
         Assertions.assertTrue(searchViewModel.state is Retry)
@@ -231,7 +231,7 @@ internal class SearchViewModelTest {
             }.toString()
 
             whenever(imageDownloader.downloadToFiles(any(), any())).thenReturn(tmpImageFileAddress)
-            initializeViewmodel()
+            searchViewModel.onCreate(testLifecycleOwner)
             searchViewModel.searchFlow.emit(sampleQuery)
             advanceUntilIdle()
             Assertions.assertTrue(searchViewModel.state is Loaded)

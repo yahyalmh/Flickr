@@ -44,6 +44,7 @@ android {
 }
 
 dependencies {
+    implementation("androidx.lifecycle:lifecycle-runtime-testing:2.5.1")
     compose()
     composeNavigation()
     composeViewModel()

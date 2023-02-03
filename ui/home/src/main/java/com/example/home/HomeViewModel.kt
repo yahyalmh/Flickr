@@ -1,13 +1,18 @@
 package com.example.home
 
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.viewModelScope
 import com.example.bookmark.BookmarksInteractor
 import com.example.data.common.database.bookmark.PhotoEntity
-import com.example.home.HomeUiState.*
+import com.example.home.HomeUiState.Empty
+import com.example.home.HomeUiState.Loaded
+import com.example.home.HomeUiState.Loading
+import com.example.home.HomeUiState.Retry
 import com.example.home.nav.HomeRoute
 import com.example.ui.common.BaseViewModel
 import com.example.ui.common.UIEvent
 import com.example.ui.common.UIState
+import com.example.ui.common.ext.addTo
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.firstOrNull
@@ -24,7 +29,7 @@ open class HomeViewModel @Inject constructor(
     private val homeRoute: HomeRoute,
 ) : BaseViewModel<HomeUiState, HomeUiEvent>(Loading) {
 
-    init {
+    override fun onStart(owner: LifecycleOwner) {
         fetchBookmarked()
     }
 
@@ -39,6 +44,7 @@ open class HomeViewModel @Inject constructor(
             }
             .catch { e -> handleRetry(e) }
             .launchIn(viewModelScope)
+            .addTo(jobDisposable)
     }
 
     private fun handleRetry(e: Throwable) = setState(Retry(state.copy(retryMessage = e.message)))

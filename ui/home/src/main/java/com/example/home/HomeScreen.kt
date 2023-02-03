@@ -14,6 +14,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.data.common.database.bookmark.PhotoEntity
 import com.example.data.common.ext.RandomString
 import com.example.flickr.ui.home.R
+import com.example.ui.common.BaseScreen
 import com.example.ui.common.ReferenceDevices
 import com.example.ui.common.component.cell.PhotoCell
 import com.example.ui.common.component.cell.PhotoShimmerCell
@@ -25,12 +26,8 @@ import com.example.ui.common.ext.createComposable
 import com.example.ui.common.test.TestTag.SHIMMER_VIEW
 
 @Composable
-fun HomeScreen(
-    modifier: Modifier = Modifier,
-    viewModel: HomeViewModel = hiltViewModel(),
-) {
+fun HomeScreen() = BaseScreen(hiltViewModel<HomeViewModel>()) { viewModel ->
     HomeScreenContent(
-        modifier = modifier,
         uiState = viewModel.state,
         onRetry = { viewModel.onEvent(HomeUiEvent.OnRetry) },
         onSearchClicked = { viewModel.onEvent(HomeUiEvent.OnSearchClick) },

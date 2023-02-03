@@ -25,6 +25,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.data.common.database.bookmark.PhotoEntity
 import com.example.data.common.model.Photo
 import com.example.flickr.ui.search.R
+import com.example.ui.common.BaseScreen
 import com.example.ui.common.component.*
 import com.example.ui.common.component.cell.PhotoCell
 import com.example.ui.common.component.cell.PhotoShimmerCell
@@ -35,11 +36,8 @@ import com.example.ui.common.component.view.EmptyView
 import com.example.ui.common.component.view.RetryView
 
 @Composable
-fun SearchScreen(
-    modifier: Modifier = Modifier,
-    viewModel: SearchViewModel = hiltViewModel()
-) {
-    SearchViewContent(modifier = modifier,
+fun SearchScreen() = BaseScreen(hiltViewModel<SearchViewModel>()) { viewModel ->
+    SearchViewContent(
         uiState = viewModel.state,
         onRetry = { viewModel.onEvent(SearchUiEvent.Retry) },
         onQueryChange = { query -> viewModel.onEvent(SearchUiEvent.QueryChange(query)) },

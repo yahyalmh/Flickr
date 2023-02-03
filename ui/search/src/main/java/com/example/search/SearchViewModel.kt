@@ -1,6 +1,8 @@
 package com.example.search
 
 import androidx.annotation.VisibleForTesting
+import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.viewModelScope
 import com.example.bookmark.BookmarksInteractor
 import com.example.data.common.database.bookmark.PhotoEntity
@@ -9,9 +11,9 @@ import com.example.data.common.model.Photo
 import com.example.data.common.model.toEntity
 import com.example.history.SearchHistoryInteractor
 import com.example.search.SearchUiState.AutoRetry
-import com.example.search.SearchUiState.Loaded
 import com.example.search.SearchUiState.Empty
 import com.example.search.SearchUiState.HistoryLoaded
+import com.example.search.SearchUiState.Loaded
 import com.example.search.SearchUiState.Loading
 import com.example.search.SearchUiState.Pagination
 import com.example.search.SearchUiState.Retry
@@ -50,15 +52,14 @@ class SearchViewModel @Inject constructor(
     private val imageDownloader: ImageDownloader,
     private val searchHistoryInteractor: SearchHistoryInteractor,
     private val connectivityMonitor: ConnectivityMonitor,
-) : BaseViewModel<SearchUiState, SearchUiEvent>(Start) {
+) : BaseViewModel<SearchUiState, SearchUiEvent>(Start), DefaultLifecycleObserver {
     @VisibleForTesting
     val searchFlow = MutableSharedFlow<String>(extraBufferCapacity = 1)
-
     private lateinit var fetchDataJob: Job
     private var paginationPageNumber: Int = 2
     private var defaultPageSize: Int = 25
 
-    init {
+    override fun onCreate(owner: LifecycleOwner) {
         fetchSearchHistory()
         observeSearchQueryChange()
     }
@@ -76,7 +77,8 @@ class SearchViewModel @Inject constructor(
                     setState(Start)
                 }
             }
-        }.launchIn(viewModelScope)
+        }
+            .launchIn(viewModelScope)
     }
 
     @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
@@ -88,7 +90,8 @@ class SearchViewModel @Inject constructor(
             .mapLatest { query ->
                 cancelFetchDataJob()
                 searchQuery(query)
-            }.launchIn(viewModelScope)
+            }
+            .launchIn(viewModelScope)
     }
 
     private fun isValuesDistinct(old: String, new: String): Boolean {
@@ -112,7 +115,10 @@ class SearchViewModel @Inject constructor(
             flickrSearchInteractor.search(query = query, page = 1, perPage = defaultPageSize),
             bookmarksInteractor.getBookmarks()
         ) { result, bookmarks -> setLoadedStat(result, bookmarks) }
-            .onStart { setState(Loading(state.copy(query = query))) }
+            .onStart {
+                paginationPageNumber = 2
+                setState(Loading(state.copy(query = query)))
+            }
             .retryOnNetworkConnection(connectivityMonitor) { e -> handleAutoRetry(e) }
             .catch { e -> handleError(e) }
             .launchIn(viewModelScope)

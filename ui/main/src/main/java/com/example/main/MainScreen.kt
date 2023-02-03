@@ -13,18 +13,14 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.main.nav.AppNavHost
 import com.example.main.theme.AppTheme
+import com.example.ui.common.BaseScreen
 import com.example.ui.common.component.bar.ConnectivityStatusView
 
 @Composable
-fun MainScreen(
-    modifier: Modifier = Modifier,
-    viewModel: MainViewModel = hiltViewModel()
-) {
-    val uiState = viewModel.state
+fun MainScreen() = BaseScreen(hiltViewModel<MainViewModel>()) { viewModel ->
     AppTheme {
         ContentView(
-            modifier = modifier,
-            uiState = uiState,
+            uiState = viewModel.state,
             navController = viewModel.navController,
         )
     }

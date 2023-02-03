@@ -1,7 +1,15 @@
 package com.example.detail
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -9,7 +17,11 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.Divider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -22,6 +34,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import com.example.data.common.model.PhotoDetail
 import com.example.flickr.ui.detail.R
+import com.example.ui.common.BaseScreen
 import com.example.ui.common.component.icon.AppIcons
 import com.example.ui.common.component.screen.TopBarScaffold
 import com.example.ui.common.component.view.RetryView
@@ -31,12 +44,8 @@ import com.google.accompanist.placeholder.shimmer
 import com.example.flickr.ui.common.R.string as commonString
 
 @Composable
-fun DetailScreen(
-    modifier: Modifier = Modifier,
-    viewModel: DetailViewModel = hiltViewModel()
-) {
+fun DetailScreen() = BaseScreen(hiltViewModel<DetailViewModel>()) { viewModel ->
     DetailScreenContent(
-        modifier = modifier,
         uiState = viewModel.state,
         onFavoriteClick = { photoDetail ->
             viewModel.onEvent(
@@ -52,7 +61,7 @@ fun DetailScreen(
 
 @Composable
 private fun DetailScreenContent(
-    modifier: Modifier,
+    modifier: Modifier = Modifier,
     uiState: DetailUiState,
     onFavoriteClick: (photoDetail: PhotoDetail?) -> Unit,
     onBackClick: () -> Unit,
@@ -101,13 +110,7 @@ private fun DataView(
 ) {
     if (isVisible) {
         var isImageLoading by remember { mutableStateOf(true) }
-        Column(
-            modifier = modifier
-                .verticalScroll(rememberScrollState())
-                .fillMaxSize(),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
+        Column(modifier = modifier.fillMaxSize()) {
             AsyncImage(modifier = Modifier
                 .padding(8.dp)
                 .clip(RoundedCornerShape(15.dp))
@@ -123,14 +126,21 @@ private fun DataView(
                 contentScale = ContentScale.FillBounds,
                 contentDescription = stringResource(id = commonString.imageContentDescription),
                 onSuccess = { isImageLoading = false })
-            photoDetail?.let {
-                TextWithDescription(title = "Title", description = it.title ?: "No title")
-                TextWithDescription(title = "Description", description = it.description)
-                TextWithDescription(title = "Views", description = it.views.toString())
-                TextWithDescription(title = "Owner", description = it.owner.toString())
-                TextWithDescription(title = "Usage", description = it.usage.toString())
-                TextWithDescription(title = "Dates", description = it.dates.toString())
-                TextWithDescription(title = "Tags", description = it.tags.joinToString("\n"))
+
+            Column(
+                modifier = Modifier.verticalScroll(rememberScrollState()),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                photoDetail?.let {
+                    TextWithDescription(title = "Title", description = it.title ?: "No title")
+                    TextWithDescription(title = "Description", description = it.description)
+                    TextWithDescription(title = "Views", description = it.views.toString())
+                    TextWithDescription(title = "Owner", description = it.owner.toString())
+                    TextWithDescription(title = "Usage", description = it.usage.toString())
+                    TextWithDescription(title = "Dates", description = it.dates.toString())
+                    TextWithDescription(title = "Tags", description = it.tags.joinToString("\n"))
+                }
             }
         }
     }

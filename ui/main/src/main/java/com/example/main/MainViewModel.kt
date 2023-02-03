@@ -1,5 +1,6 @@
 package com.example.main
 
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
 import com.example.main.MainUiState.ConnectivityStatus
@@ -8,6 +9,7 @@ import com.example.ui.common.BaseViewModel
 import com.example.ui.common.UIEvent
 import com.example.ui.common.UIState
 import com.example.ui.common.connectivity.ConnectivityMonitor
+import com.example.ui.common.ext.addTo
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -22,7 +24,8 @@ class MainViewModel @Inject constructor(
 ) : BaseViewModel<MainUiState, MainUiEvent>(Start) {
     private var isAppLaunchedForFirstTime: Boolean = true
 
-    init {
+    override fun onStart(owner: LifecycleOwner) {
+        isAppLaunchedForFirstTime = true
         observeConnectivityState()
     }
 
@@ -40,7 +43,9 @@ class MainViewModel @Inject constructor(
                         )
                     )
                 )
-            }.launchIn(viewModelScope)
+            }
+            .launchIn(viewModelScope)
+            .addTo(jobDisposable)
     }
 
     private fun checkConnectivityStatusVisibility(isOnline: Boolean): Boolean {
