@@ -23,6 +23,7 @@ object Version {
         const val CORE_KTX = "1.9.0"
         const val LIFECYCLE = "2.6.0-alpha03"
         const val ANDROIDX_TEST = "1.5.0"
+        const val LIFECYCLE_TESTING = "2.5.1"
         const val ANDROIDX_JUNIT = "1.1.3"
     }
 

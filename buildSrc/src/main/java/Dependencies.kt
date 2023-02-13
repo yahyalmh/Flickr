@@ -44,6 +44,7 @@ object Dependencies {
     const val ANDROIDX_JUNIT = "androidx.test.ext:junit:${Version.Androidx.ANDROIDX_JUNIT}"
     const val ANDROIDX_TEST_CORE = "androidx.test:core:${Version.Androidx.ANDROIDX_TEST}"
     const val ANDROIDX_TEST_RUNNER = "androidx.test:runner:${Version.Androidx.ANDROIDX_TEST}"
+    const val ANDROIDX_LIFECYCLE_TESTING = "androidx.lifecycle:lifecycle-runtime-testing:${Version.Androidx.LIFECYCLE_TESTING}"
 
     const val JUNIT = "junit:junit:${Version.Junit.JUNIT}"
     const val JUNIT5_API = "org.junit.jupiter:junit-jupiter-api:${Version.Junit.JUNIT5}"
@@ -172,6 +173,7 @@ fun DependencyHandler.androidXTest() {
     androidTestImplementation(Dependencies.ANDROIDX_TEST_CORE)
     androidTestImplementation(Dependencies.ANDROIDX_TEST_RUNNER)
     implementation(Dependencies.ANDROIDX_TEST_RUNNER)
+    implementation(Dependencies.ANDROIDX_LIFECYCLE_TESTING)
 }
 
 fun DependencyHandler.junit4() {
