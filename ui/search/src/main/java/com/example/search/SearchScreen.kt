@@ -30,7 +30,7 @@ import com.example.ui.common.component.*
 import com.example.ui.common.component.cell.PhotoCell
 import com.example.ui.common.component.cell.PhotoShimmerCell
 import com.example.ui.common.component.icon.AppIcons
-import com.example.ui.common.component.screen.SearchBarScaffold
+import com.example.ui.common.component.screen.SearchBarSurface
 import com.example.ui.common.component.view.AutoRetryView
 import com.example.ui.common.component.view.EmptyView
 import com.example.ui.common.component.view.RetryView
@@ -39,48 +39,26 @@ import com.example.ui.common.component.view.RetryView
 fun SearchScreen() = BaseScreen(hiltViewModel<SearchViewModel>()) { viewModel ->
     SearchViewContent(
         uiState = viewModel.state,
-        onRetry = { viewModel.onEvent(SearchUiEvent.Retry) },
-        onQueryChange = { query -> viewModel.onEvent(SearchUiEvent.QueryChange(query)) },
-        onSearchClick = { text -> viewModel.onEvent(SearchUiEvent.OnSaveSearch(text)) },
-        onCancelClick = { viewModel.onEvent(SearchUiEvent.ClosSearch) },
-        onBookmarkClick = { photo -> viewModel.onEvent(SearchUiEvent.OnBookmark(photo)) },
-        onPhotoClick = { photoId -> viewModel.onEvent(SearchUiEvent.OnPhotoClick(photoId)) },
-        onHistoryClick = { history ->
-            viewModel.onEvent(SearchUiEvent.OnHistoryClick(history))
-        },
-        onClearHistoryClick = { history ->
-            viewModel.onEvent(SearchUiEvent.OnClearHistoryClick(history))
-        },
-        onPagination = { viewModel.onEvent(SearchUiEvent.OnPagination) })
+    ) { event: SearchUiEvent -> viewModel.onEvent(event) }
 }
 
 @Composable
 private fun SearchViewContent(
     modifier: Modifier = Modifier,
     uiState: SearchUiState,
-    onRetry: () -> Unit,
-    onCancelClick: () -> Unit,
-    onQueryChange: (query: String) -> Unit,
-    onSearchClick: (text: String) -> Unit,
-    onBookmarkClick: (photo: Photo) -> Unit,
-    onPhotoClick: (photoId: String) -> Unit,
-    onHistoryClick: (history: String) -> Unit,
-    onClearHistoryClick: (history: String) -> Unit,
-    onPagination: () -> Unit,
+    onUiEvent: (SearchUiEvent) -> Unit,
 ) {
     HandleKeyboard(uiState.isKeyboardHidden)
-    SearchBarScaffold(
-        modifier = modifier.background(MaterialTheme.colorScheme.surface),
+    SearchBarSurface(modifier = modifier.background(MaterialTheme.colorScheme.surface),
         hint = stringResource(id = R.string.searchBarHint),
         savedQuery = uiState.query,
         histories = uiState.histories.map { it.text },
         isHistoryVisible = uiState.isHistoryVisible,
-        onQueryChange = onQueryChange,
-        onCancelClick = onCancelClick,
-        onSearchClick = onSearchClick,
-        onHistoryClick = onHistoryClick,
-        onClearHistoryClick = onClearHistoryClick
-    ) {
+        onQueryChange = { query -> onUiEvent(SearchUiEvent.QueryChange(query)) },
+        onCancelClick = { onUiEvent(SearchUiEvent.ClosSearch) },
+        onSearchClick = { text -> onUiEvent(SearchUiEvent.OnSaveSearch(text)) },
+        onHistoryClick = { history -> onUiEvent(SearchUiEvent.OnHistoryClick(history)) },
+        onClearHistoryClick = { history -> onUiEvent(SearchUiEvent.OnClearHistoryClick(history)) }) {
         SearchShimmerView(
             modifier = modifier,
             isVisible = uiState.isLoading,
@@ -93,12 +71,10 @@ private fun SearchViewContent(
             hint = stringResource(id = R.string.searchAutoRetryHint)
         )
 
-        RetryView(
-            isVisible = uiState.isRetry,
+        RetryView(isVisible = uiState.isRetry,
             retryMessage = uiState.retryMessage,
             icon = AppIcons.Warning,
-            onRetry = onRetry
-        )
+            onRetry = { onUiEvent(SearchUiEvent.Retry) })
 
         StartView(
             modifier = modifier,
@@ -118,9 +94,7 @@ private fun SearchViewContent(
             isPagination = uiState.isPagination,
             result = uiState.result,
             bookmarkedPhotos = uiState.bookmarkedPhotos,
-            onPhotoClick = onPhotoClick,
-            onBookmarkClick = onBookmarkClick,
-            onPagination = onPagination,
+            onUiEvent = onUiEvent,
         )
     }
 }
@@ -132,13 +106,12 @@ private fun DataView(
     isPagination: Boolean,
     result: List<Photo>,
     bookmarkedPhotos: List<PhotoEntity>,
-    onPhotoClick: (photoId: String) -> Unit,
-    onBookmarkClick: (photo: Photo) -> Unit,
-    onPagination: () -> Unit,
+    onUiEvent: (SearchUiEvent) -> Unit,
 ) {
     if (isVisible) {
         val lazyListState = rememberLazyGridState()
-        SetupListPagination(lazyListState = lazyListState, onPagination = onPagination)
+        SetupListPagination(lazyListState = lazyListState,
+            onPagination = { onUiEvent(SearchUiEvent.OnPagination) })
         if (lazyListState.isScrollInProgress) {
             HandleKeyboard(isKeyboardHidden = true)
         }
@@ -150,10 +123,7 @@ private fun DataView(
             state = lazyListState,
             columns = GridCells.Adaptive(minSize = 150.dp)
         ) {
-            items(
-                items = result.distinctBy { it.id },
-                key = { item -> item.id }
-            ) { photo ->
+            items(items = result.distinctBy { it.id }, key = { item -> item.id }) { photo ->
                 val leadingIcon = if (bookmarkedPhotos.any { it.id == photo.id }) {
                     AppIcons.Favorite
                 } else {
@@ -162,8 +132,8 @@ private fun DataView(
                 PhotoCell(address = photo.getImageUrl(),
                     title = photo.title,
                     leadingIcon = leadingIcon,
-                    onClick = { onPhotoClick(photo.id) },
-                    onLeadingIconClick = { onBookmarkClick(photo) })
+                    onClick = { onUiEvent(SearchUiEvent.OnPhotoClick(photo.id)) },
+                    onLeadingIconClick = { onUiEvent(SearchUiEvent.OnBookmark(photo)) })
             }
             // Add a shimmer cell while pagination
             if (isPagination) {
@@ -258,14 +228,6 @@ private fun buildNoResultHint(query: String) = buildAnnotatedString {
 fun SearchPreview() {
     SearchViewContent(
         uiState = SearchUiState.Start,
-        onRetry = {},
-        onCancelClick = {},
-        onQueryChange = {},
-        onSearchClick = {},
-        onBookmarkClick = {},
-        onHistoryClick = {},
-        onClearHistoryClick = {},
-        onPagination = {},
-        onPhotoClick = {},
+        onUiEvent = {},
     )
 }

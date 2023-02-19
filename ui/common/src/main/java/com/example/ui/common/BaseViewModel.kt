@@ -7,16 +7,16 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
 import com.example.ui.common.utility.JobDisposable
 
-abstract class BaseViewModel<T : UIState, E : UIEvent>(
-    initialState: T
+abstract class BaseViewModel<S : UIState, E : UIEvent>(
+    initialState: S
 ) : ViewModel(), DefaultLifecycleObserver {
-    private val internalSate: MutableState<T> = mutableStateOf(initialState)
+    private val internalSate: MutableState<S> = mutableStateOf(initialState)
     protected val jobDisposable by lazy { JobDisposable() }
-    val state: T get() = internalSate.value
+    val state: S get() = internalSate.value
 
     abstract fun onEvent(event: E)
 
-    protected fun setState(state: T) {
+    protected fun setState(state: S) {
         internalSate.value = state
     }
 

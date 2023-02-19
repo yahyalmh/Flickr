@@ -17,7 +17,7 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import com.example.ui.common.component.bar.SearchBar
 
 @Composable
-fun SearchBarScaffold(
+fun SearchBarSurface(
     modifier: Modifier = Modifier,
     hint: String,
     savedQuery: String,
