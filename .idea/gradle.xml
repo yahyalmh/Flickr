@@ -21,6 +21,7 @@
             <option value="$PROJECT_DIR$/ui" />
             <option value="$PROJECT_DIR$/ui/common" />
             <option value="$PROJECT_DIR$/ui/detail" />
+            <option value="$PROJECT_DIR$/ui/guide" />
             <option value="$PROJECT_DIR$/ui/home" />
             <option value="$PROJECT_DIR$/ui/main" />
             <option value="$PROJECT_DIR$/ui/search" />
