@@ -7,7 +7,6 @@ import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -18,8 +17,6 @@ import androidx.compose.ui.platform.AndroidViewConfiguration
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.zIndex
 import com.example.ui.common.component.icon.AppIcons
 import com.example.ui.common.component.view.AutoRetryView
 import kotlinx.coroutines.TimeoutCancellationException
@@ -40,7 +37,6 @@ fun SegmentScreen(
     val segmentBarState = rememberSegmentBarState()
     Box(
         modifier = modifier
-            .padding(2.dp)
             .fillMaxSize()
             .pointerInput(Unit) {
                 handleTaps(
@@ -59,11 +55,8 @@ fun SegmentScreen(
             onBarFinish = onFinish
         )
 
-        AnimatedContent(
-            modifier = Modifier.zIndex(-1f),
-            targetState = segmentBarState.currentSegmentIndex
-        ) {
-            content[segmentBarState.currentSegmentIndex]()
+        AnimatedContent(targetState = segmentBarState.currentSegmentIndex) {
+            content[it]()
         }
     }
 }
@@ -101,11 +94,12 @@ fun SegmentScreenPreview() {
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
     val content = buildList<@Composable () -> Unit> {
-        repeat(5) {
+        repeat(10) {
             add {
                 AutoRetryView(
                     icon = AppIcons.Search,
-                    errorMessage = "This is page number $it"
+                    errorMessage = "This is segment number",
+                    hint = "$it"
                 )
             }
         }

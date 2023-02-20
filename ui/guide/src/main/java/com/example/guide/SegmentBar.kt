@@ -44,6 +44,8 @@ fun SegmentBar(
         }
         Row(
             modifier = modifier
+                .padding(vertical = 3.dp, horizontal = 2.dp)
+                .zIndex(1f)
                 .fillMaxWidth()
                 .height(IntrinsicSize.Max),
             horizontalArrangement = Arrangement.SpaceEvenly
