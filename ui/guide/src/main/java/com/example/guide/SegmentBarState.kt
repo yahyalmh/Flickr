@@ -50,9 +50,13 @@ class SegmentBarState constructor(
     internal var stopPoint by mutableStateOf(progressStopPoint)
         private set
 
-    fun getProgressStartPoint(segmentIndex: Int): Float = when (getCurrentActionType(segmentIndex)) {
-        ActionType.NONE -> if (currentSegmentIndex >= segmentIndex) 1f else 0f
-        else -> stopPoint
+    fun getCurrentActionType(segmentIndex: Int): ActionType = when {
+        currentSegmentIndex == segmentIndex -> currentAction
+        // reset the segment progress when the PREVIOUS action has been occurred on the next segment
+        currentSegmentIndex != segmentsCount
+                && currentSegmentIndex == segmentIndex + 1
+                && currentAction == ActionType.PREVIOUS -> ActionType.RESET
+        else -> ActionType.NONE
     }
 
     fun saveProgress(segmentIndex: Int, progress: Float) {
@@ -61,19 +65,11 @@ class SegmentBarState constructor(
         }
     }
 
-    fun hide() {
-        isVisible = false
-    }
-
-    fun show() {
-        isVisible = true
-    }
-
-    fun getCurrentActionType(segmentIndex: Int): ActionType = when {
-        currentSegmentIndex == segmentIndex -> currentAction
-        currentSegmentIndex != segmentsCount && currentSegmentIndex == segmentIndex + 1 && currentAction == ActionType.PREVIOUS -> ActionType.RESET
-        else -> ActionType.NONE
-    }
+    fun getProgressStartPoint(segmentIndex: Int): Float =
+        when (getCurrentActionType(segmentIndex)) {
+            ActionType.NONE -> if (currentSegmentIndex >= segmentIndex) 1f else 0f
+            else -> stopPoint
+        }
 
     internal fun moveToNextSegment() {
         if (currentSegmentIndex < segmentsCount) {
@@ -89,20 +85,22 @@ class SegmentBarState constructor(
         currentAction = ActionType.RUN
     }
 
-    fun stop() {
-        currentAction = ActionType.STOP
-        isRunning = false
+    fun hide() {
+        isVisible = false
     }
 
-    fun finish() {
-        currentAction = ActionType.NONE
-        isRunning = false
-        isFinished = true
+    fun show() {
+        isVisible = true
     }
 
     fun run() {
         currentAction = ActionType.RUN
         isRunning = true
+    }
+
+    fun stop() {
+        currentAction = ActionType.STOP
+        isRunning = false
     }
 
     fun next() {
@@ -113,6 +111,12 @@ class SegmentBarState constructor(
     fun previous() {
         currentAction = ActionType.PREVIOUS
         isRunning = true
+    }
+
+    fun finish() {
+        currentAction = ActionType.NONE
+        isRunning = false
+        isFinished = true
     }
 
     companion object {

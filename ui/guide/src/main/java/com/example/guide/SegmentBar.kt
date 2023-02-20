@@ -1,7 +1,6 @@
 package com.example.guide
 
 import androidx.compose.animation.core.Animatable
-import androidx.compose.animation.core.AnimationVector1D
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
@@ -44,6 +43,8 @@ fun SegmentBar(
         }
         Row(
             modifier = modifier
+                .padding(vertical = 3.dp, horizontal = 2.dp)
+                .zIndex(1f)
                 .fillMaxWidth()
                 .height(IntrinsicSize.Max),
             horizontalArrangement = Arrangement.SpaceEvenly
@@ -84,12 +85,11 @@ internal fun Segment(
             .background(Color.Transparent)
             .zIndex(1f)
             .border(0.001.dp, Color.LightGray, RoundedCornerShape(16.dp))
-//            .shadow(elevation = 1.dp, spotColor = Color.Transparent)
             .clip(RoundedCornerShape(16.dp))
             .fillMaxWidth(),
         color = color,
         backgroundColor = backgroundColor,
-        progress = progress.value
+        progress = progress
     )
 }
 
@@ -98,12 +98,12 @@ private fun animatable(
     state: SegmentBarState,
     id: Int,
     animationDuration: Int,
-): Animatable<Float, AnimationVector1D> {
+): Float {
     val action = state.getCurrentActionType(id)
     val targetValue = 1f
     val progress = remember { Animatable(state.getProgressStartPoint(id)) }
     if (action == ActionType.RUN && progress.value == targetValue) {
-        onNextSpot(state)
+        onNextSegment(state)
     }
     LaunchedEffect(progress.value) { state.saveProgress(id, progress.value) }
     LaunchedEffect(action) {
@@ -117,7 +117,7 @@ private fun animatable(
             }
             ActionType.NEXT -> {
                 progress.snapTo(targetValue)
-                onNextSpot(state)
+                onNextSegment(state)
             }
             ActionType.PREVIOUS -> {
                 progress.snapTo(0f)
@@ -128,10 +128,10 @@ private fun animatable(
             ActionType.NONE -> Unit
         }
     }
-    return progress
+    return progress.value
 }
 
-private fun onNextSpot(
+private fun onNextSegment(
     state: SegmentBarState,
 ) = if (state.currentSegmentIndex == state.segmentsCount) {
     state.finish()
@@ -140,7 +140,7 @@ private fun onNextSpot(
 }
 
 @Composable
-@Preview(showBackground = true, showSystemUi = true)
+@Preview(showBackground = true, heightDp = 200)
 fun SegmentBarPreview() {
-    SegmentBar(segmentsCount = 6)
+    SegmentBar(segmentsCount = 3, backgroundColor = Color.Black)
 }
