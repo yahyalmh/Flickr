@@ -4,21 +4,29 @@ import android.view.ViewConfiguration
 import android.widget.Toast
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.PointerInputScope
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.AndroidViewConfiguration
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import com.example.ui.common.component.icon.AppIcons
-import com.example.ui.common.component.view.AutoRetryView
+import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
@@ -89,18 +97,42 @@ private suspend fun PointerInputScope.handleTaps(
 }
 
 @Composable
-@Preview(showBackground = true)
+@Preview(name = "SegmentScreen", showBackground = true)
 fun SegmentScreenPreview() {
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
     val content = buildList<@Composable () -> Unit> {
-        repeat(10) {
+        repeat(6) {
             add {
-                AutoRetryView(
-                    icon = AppIcons.Search,
-                    errorMessage = "This is segment number",
-                    hint = "$it"
-                )
+                Column(
+                    modifier = Modifier
+                        .imePadding()
+                        .background(Color.LightGray)
+                        .padding(10.dp)
+                        .fillMaxSize(),
+                    verticalArrangement = Arrangement.spacedBy(
+                        space = 30.dp,
+                        alignment = Alignment.CenterVertically
+                    ),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        text = "This is segment number",
+                        modifier = Modifier.padding(12.dp),
+                        textAlign = TextAlign.Center,
+                        style = MaterialTheme.typography.headlineMedium,
+                        color = MaterialTheme.colorScheme.onBackground
+                    )
+
+                    Text(
+                        text = it.toString(),
+                        modifier = Modifier.padding(12.dp),
+                        textAlign = TextAlign.Center,
+                        style = MaterialTheme.typography.headlineLarge,
+                        color = MaterialTheme.colorScheme.onBackground
+                    )
+
+                }
             }
         }
     }
