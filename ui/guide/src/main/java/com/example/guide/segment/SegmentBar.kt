@@ -1,4 +1,4 @@
-package com.example.guide
+package com.example.guide.segment
 
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.LinearEasing
@@ -23,6 +23,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
+import com.example.guide.ActionType
+import com.example.guide.SegmentBarState
+import com.example.guide.rememberSegmentBarState
 import kotlin.math.roundToInt
 
 @Composable

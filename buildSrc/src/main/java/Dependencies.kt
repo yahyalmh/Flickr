@@ -42,9 +42,11 @@ object Dependencies {
     const val HILT_ANDROID_COMPILER = "com.google.dagger:hilt-android-compiler:${Version.HILT}"
 
     const val ANDROIDX_JUNIT = "androidx.test.ext:junit:${Version.Androidx.ANDROIDX_JUNIT}"
+    const val ANDROIDX_TEST_RULES = "androidx.test:rules:${Version.Androidx.ANDROIDX_TEST})"
     const val ANDROIDX_TEST_CORE = "androidx.test:core:${Version.Androidx.ANDROIDX_TEST}"
     const val ANDROIDX_TEST_RUNNER = "androidx.test:runner:${Version.Androidx.ANDROIDX_TEST}"
-    const val ANDROIDX_LIFECYCLE_TESTING = "androidx.lifecycle:lifecycle-runtime-testing:${Version.Androidx.LIFECYCLE_TESTING}"
+    const val ANDROIDX_LIFECYCLE_TESTING =
+        "androidx.lifecycle:lifecycle-runtime-testing:${Version.Androidx.LIFECYCLE_TESTING}"
 
     const val JUNIT = "junit:junit:${Version.Junit.JUNIT}"
     const val JUNIT5_API = "org.junit.jupiter:junit-jupiter-api:${Version.Junit.JUNIT5}"
@@ -87,6 +89,14 @@ object Dependencies {
     const val COIL_COMPOSE = "io.coil-kt:coil-compose:${Version.COIL}"
     const val ACCOMPANIST_PLACEHOLDER =
         "com.google.accompanist:accompanist-placeholder-material:${Version.ACCOMPANIST}"
+
+    const val PROFILE_INSTALLER =
+        "androidx.profileinstaller:profileinstaller:${Version.benchmark.POFILE_INSTALLER}"
+    const val UI_AUTOMATOR = "androidx.test.uiautomator:uiautomator:${Version.Test.UI_AUTOMATOR}"
+    const val BENCHMARK_MACRO =
+        "androidx.benchmark:benchmark-junit4:${Version.benchmark.BENCHMARK_JUNIT4}"
+
+    const val EXO_PLAYER = "com.google.android.exoplayer:exoplayer:${Version.EXO_PLAYER}"
 }
 
 fun DependencyHandler.androidxCore() = implementation(Dependencies.ANDROIDX_CORE_KTX)
@@ -172,6 +182,7 @@ fun DependencyHandler.androidXTest() {
     androidTestImplementation(Dependencies.ANDROIDX_JUNIT)
     androidTestImplementation(Dependencies.ANDROIDX_TEST_CORE)
     androidTestImplementation(Dependencies.ANDROIDX_TEST_RUNNER)
+    androidTestImplementation(Dependencies.ANDROIDX_TEST_RULES)
     implementation(Dependencies.ANDROIDX_TEST_RUNNER)
     implementation(Dependencies.ANDROIDX_LIFECYCLE_TESTING)
 }
@@ -195,6 +206,22 @@ fun DependencyHandler.mockito() {
     testImplementation(Dependencies.MOCKITO_JUNIT)
     testImplementation(Dependencies.MOCKITO_INLINE)
     testImplementation(Dependencies.MOCKITO_KOTLIN)
+}
+
+fun DependencyHandler.profiller() {
+    runtimeOnly(Dependencies.PROFILE_INSTALLER)
+}
+
+fun DependencyHandler.uiAutomator() {
+    implementation(Dependencies.UI_AUTOMATOR)
+}
+
+fun DependencyHandler.benchmarkMacro() {
+    implementation(Dependencies.BENCHMARK_MACRO)
+}
+
+fun DependencyHandler.exoPlayer() {
+    implementation(Dependencies.EXO_PLAYER)
 }
 
 fun DependencyHandler.moduleDependency(dependency: Dependency) {

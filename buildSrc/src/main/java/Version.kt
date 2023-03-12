@@ -6,10 +6,15 @@ object Version {
     const val HILT = "2.44"
     const val ACCOMPANIST = "0.28.0"
     const val COIL = "2.2.2"
+    const val EXO_PLAYER = "2.18.4"
 
     object Mockito {
         const val CORE = "4.10.0"
         const val KOTLIN = "3.2.0"
+    }
+
+    object Test{
+        const val UI_AUTOMATOR = "2.3.0-alpha02"
     }
 
     object Retrofit {
@@ -41,6 +46,11 @@ object Version {
         const val JUNIT5 = "5.9.1"
         const val JUNIT = "4.13.2"
     }
+
+    object benchmark{
+        const val POFILE_INSTALLER = "1.3.0-beta01"
+        const val BENCHMARK_JUNIT4 = "1.2.0-alpha09"
+   }
 
     object Plugin {
         const val JUNIT5_GRADLE_PLUGIN = "1.8.2.1"

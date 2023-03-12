@@ -28,6 +28,10 @@ android {
                 "proguard-rules.pro"
             )
         }
+//        benchmark {
+//            initWith(buildTypes.getByName("release"))
+//            proguardFiles("benchmark-rules.pro")
+//        }
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
@@ -62,5 +66,6 @@ dependencies {
     coroutines()
     hilt()
     junit4()
+    profiller()
     moduleDependency(projects.ui.main)
 }

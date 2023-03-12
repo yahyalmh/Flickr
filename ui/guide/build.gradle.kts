@@ -51,6 +51,6 @@ dependencies {
     hilt()
 
     junit4()
-
+    exoPlayer()
     moduleDependency(projects.ui.common)
 }

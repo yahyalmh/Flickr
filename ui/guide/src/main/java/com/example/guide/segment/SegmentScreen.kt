@@ -1,4 +1,4 @@
-package com.example.guide
+package com.example.guide.segment
 
 import android.view.ViewConfiguration
 import android.widget.Toast
@@ -27,6 +27,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.guide.SegmentBarState
+import com.example.guide.rememberSegmentBarState
 import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
